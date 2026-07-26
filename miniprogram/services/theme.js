@@ -51,10 +51,21 @@ function effective() {
   return pref === 'auto' ? systemTheme() : pref;
 }
 
-// 把生效主题刷到原生组件（导航栏 / tabBar / 窗口背景）
-function applyToNative(name) {
-  const cfg = NATIVE[name] || NATIVE.dark;
+function nativeConfig(name) {
+  return NATIVE[name] || NATIVE.dark;
+}
+
+// 页面切换时只需要恢复会被页面配置重置的原生页头和窗口背景。
+function applyPageChrome(name) {
+  const cfg = nativeConfig(name);
   wx.setNavigationBarColor(cfg.nav);
+  wx.setBackgroundColor({ backgroundColor: cfg.pageBg, backgroundColorTop: cfg.pageBg, backgroundColorBottom: cfg.pageBg });
+}
+
+// 应用启动或用户主动切换主题时，完整同步原生组件。
+function applyToNative(name) {
+  const cfg = nativeConfig(name);
+  applyPageChrome(name);
   wx.setTabBarStyle(cfg.tab);
   TABS.forEach((t, i) => {
     wx.setTabBarItem({
@@ -63,12 +74,7 @@ function applyToNative(name) {
       selectedIconPath: `images/tab_${t}${cfg.iconSuffix === '' ? '_active' : '_light_active'}.png`,
     });
   });
-  wx.setBackgroundColor({ backgroundColor: cfg.pageBg, backgroundColorTop: cfg.pageBg, backgroundColorBottom: cfg.pageBg });
 }
-
-// DevTools can retain callers across partial hot reloads, so preserve the
-// former page-only entry point as an alias until the next full reload.
-const applyPageChrome = applyToNative;
 
 // 用户切换主题
 function setTheme(pref) {

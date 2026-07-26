@@ -4,10 +4,9 @@
   background: var(--mask);
   z-index: 52;
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.25s;
 }
-.mask--show { opacity: 1; pointer-events: auto; }
+.mask--show { opacity: 1; }
 
 .sheet {
   position: fixed;

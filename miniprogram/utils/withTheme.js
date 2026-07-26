@@ -3,6 +3,26 @@
 const themeService = require('../services/theme');
 const store = require('../store/index');
 
+function syncPageChrome(theme) {
+  // A partially refreshed DevTools bundle can retain the previous theme
+  // service shape. The complete synchronizer is a safe compatibility fallback.
+  const apply = typeof themeService.applyPageChrome === 'function'
+    ? themeService.applyPageChrome
+    : themeService.applyToNative;
+
+  if (typeof apply !== 'function') {
+    console.error('[theme] Native page chrome synchronizer is unavailable');
+    return;
+  }
+
+  const run = () => apply(theme);
+  if (typeof wx.nextTick === 'function') {
+    wx.nextTick(run);
+  } else {
+    setTimeout(run, 0);
+  }
+}
+
 function withTheme(options) {
   const userOnLoad = options.onLoad;
   const userOnShow = options.onShow;
@@ -23,10 +43,10 @@ function withTheme(options) {
     onShow() {
       // 从设置页返回或系统主题变化后兜底同步
       const t = themeService.effective();
-      // 页面切换会恢复 app.json 的默认导航栏配置，需为当前页重新应用主题。
-      themeService.applyToNative(t);
       if (this.data.theme !== t) this.setData({ theme: t });
       userOnShow && userOnShow.call(this);
+      // 让页面配置先完成恢复，再补齐会被重置的导航栏和窗口背景。
+      syncPageChrome(t);
     },
 
     onUnload() {
