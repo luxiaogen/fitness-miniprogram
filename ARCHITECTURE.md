@@ -47,7 +47,7 @@
 
 - **数据**：`data/plans.js` 静态打包 4 个热门计划（三分化线性渐进 / 新手全身 / 上下肢二分化 / 五分化健美），课表动作通过 `exId` 引用动作库，保证演示图与详情可达；
 - **应用计划**：`services/plan.js` 将 `{planId, appliedAt}` 存本地（接入云后可迁移 users 集合），`store.planVersion` 广播变更；
-- **一键填入**：log 页顶部计划横幅展示当前计划的各训练日，点击将该日全部动作批量写入当前日期记录（`fillDayToRecords` 串行写入，备注合并"训练日 · 动作要点"）。
+- **一键填入**：log 页顶部计划横幅展示当前计划的各训练日，点击将该日全部动作批量写入当前日期记录（本地一次写入、云端事务写入，备注合并"训练日 · 动作要点"）。
 
 导航逻辑：
 
@@ -209,7 +209,7 @@ cloudfunctions/
 
 ### 上线 checklist
 
-1. 注册小程序 AppID，替换 `project.config.json` 的 `appid`；
+1. 注册小程序 AppID，复制 `project.private.config.example.json` 为 Git 忽略的 `project.private.config.json`，并只在该本地文件填写 `appid`；
 2. 开通云开发，把环境 ID 填入 `miniprogram/env.js` 的 `CLOUD_ENV`；
 3. 创建 `users / records / notes` 三个集合，权限设为「仅创建者可读写」，并创建上述联合索引；
 4. 右键分别部署 `login / records / notes` 三个云函数；
@@ -222,7 +222,8 @@ cloudfunctions/
 
 ```
 exercise-tracker-miniprogram/
-├── project.config.json          # 工程配置（appid / 云函数目录）
+├── project.config.json          # 可共享工程配置（不含 AppID）
+├── project.private.config.example.json # 本地 AppID 配置模板
 ├── ARCHITECTURE.md              # 本文档
 ├── miniprogram/
 │   ├── app.js / app.json / app.wxss / env.js / sitemap.json

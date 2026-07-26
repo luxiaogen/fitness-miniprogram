@@ -37,7 +37,7 @@
 
 1. 安装并打开[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
 2. 导入本仓库根目录。
-3. 将 `project.config.json` 中的 `appid` 替换为你自己的小程序 AppID。
+3. 复制 `project.private.config.example.json` 为 `project.private.config.json`，并只在后者填写自己的小程序 AppID。该本地文件已被 Git 忽略，不能提交。
 4. 在开发者工具中编译 `miniprogram/`。
 
 未配置云环境时，项目会使用本地存储完成完整演示：
@@ -71,6 +71,7 @@ CLOUD_ENV: ''
 │   ├── data/                  # 51 个动作与 4 个训练计划
 │   └── utils/                 # 日期、主题包装、数据校验与错误提示
 ├── cloudfunctions/            # login / records / notes
+├── project.private.config.example.json # 本地 AppID 配置模板
 ├── assets/readme/             # README 视觉资产
 ├── ARCHITECTURE.md            # 架构与云函数接口说明
 └── DESIGN.md                  # Volt Gym 视觉设计系统
@@ -101,6 +102,7 @@ GitHub Actions 会在推送和 Pull Request 时运行相同校验。
 - 动作库和训练计划是随版本发布的静态数据，不支持在线编辑。
 - 统计目前由前端聚合周期内记录，适合 MVP 阶段的个人数据量。
 - `CLOUD_ENV` 默认为空；生产使用前需要配置自己的 AppID、云环境和数据库集合。
+- AppID 仅保存在被忽略的 `project.private.config.json`；真正敏感的 AppSecret、访问令牌和私钥绝不能放入仓库或小程序前端。
 - 已有本地数据不会自动迁移到后来配置的云环境；发布迁移功能前，应先提供用户确认、备份与导入流程。
 - 仓库未附带可直接提交的隐私协议与审核材料。请按实际运营主体、联系方式、用途、留存期限和用户权利补充，不能默认声明“无收集”。
 
@@ -136,7 +138,7 @@ It runs in a local-storage demo mode by default, so the project can be explored 
 
 1. Install [WeChat DevTools](https://developers.weixin.qq.com/miniprogram/en/dev/devtools/download.html).
 2. Import the repository root.
-3. Replace `appid` in `project.config.json` with your own Mini Program AppID.
+3. Copy `project.private.config.example.json` to `project.private.config.json` and put your Mini Program AppID only in the private file. It is Git-ignored and must not be committed.
 4. Compile `miniprogram/` in DevTools.
 
 Without a cloud environment, the complete flow runs on local storage:
@@ -170,6 +172,7 @@ Cloud request and silent-login failures are surfaced to the user instead of sile
 │   ├── data/                  # 51 exercises and 4 training plans
 │   └── utils/                 # Dates, theme wrapper, validation, and notifications
 ├── cloudfunctions/            # login / records / notes
+├── project.private.config.example.json # Local AppID template
 ├── assets/readme/             # README visual assets
 ├── ARCHITECTURE.md            # Architecture and cloud API notes
 └── DESIGN.md                  # Volt Gym visual design system
@@ -200,6 +203,7 @@ GitHub Actions runs the same command on pushes and pull requests.
 - The exercise library and training plans are static release data; they are not editable online.
 - Statistics are currently aggregated on the client, which is appropriate for MVP-scale personal data.
 - `CLOUD_ENV` is empty by default; production use requires your own AppID, cloud environment, and collections.
+- Keep the AppID only in Git-ignored `project.private.config.json`. Never put a real AppSecret, access token, or private key in the repository or Mini Program client.
 - Existing local data is not automatically migrated when cloud mode is enabled later. A migration feature needs explicit consent, backup, and import support.
 - A submission-ready privacy policy and review materials are not included. Complete them with the real operator, contact, purpose, retention, and user-rights details; do not default to a “no collection” claim.
 

@@ -2,7 +2,7 @@
   "description": "健身记 - 基于 exercises-dataset 的锻炼记录与动作标注小程序（MVP）",
   "compileType": "miniprogram",
   "libVersion": "3.8.12",
-  "appid": "wx1f3e3c736d64ca46",
+  "appid": "",
   "projectname": "exercise-tracker-miniprogram",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",

@@ -3,4 +3,6 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local Mini Program AppID and developer-tool overrides.
 project.private.config.json

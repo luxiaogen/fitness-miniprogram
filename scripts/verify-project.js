@@ -35,6 +35,16 @@ for (const file of jsonFiles) {
   }
 }
 
+const projectConfig = JSON.parse(fs.readFileSync(path.join(root, 'project.config.json'), 'utf8'));
+const privateConfigTemplate = JSON.parse(
+  fs.readFileSync(path.join(root, 'project.private.config.example.json'), 'utf8'),
+);
+assert(!projectConfig.appid, 'project.config.json must not contain a Mini Program AppID');
+assert(
+  privateConfigTemplate.appid === 'YOUR_MINIPROGRAM_APPID',
+  'project.private.config.example.json must contain only the AppID placeholder',
+);
+
 const { EXERCISES } = require(path.join(root, 'miniprogram/data/exercises'));
 const { PLANS } = require(path.join(root, 'miniprogram/data/plans'));
 const exerciseIds = new Set(EXERCISES.map(exercise => exercise.id));
