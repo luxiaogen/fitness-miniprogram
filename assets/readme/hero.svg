@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">健身记 Fitness Mini Program</title>
+  <desc id="desc">A dark Volt Gym themed overview of exercise library, workout records, calendar, statistics, and cloud or local persistence.</desc>
+  <rect width="1200" height="420" rx="28" fill="#0E100E"/>
+  <rect x="1" y="1" width="1198" height="418" rx="27" fill="none" stroke="#313830" stroke-width="2"/>
+
+  <g id="title-block" transform="translate(64 58)">
+    <text x="0" y="0" fill="#C8F542" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="18" font-weight="700" letter-spacing="3">WORKOUT LOG / 训练记录</text>
+    <text x="0" y="70" fill="#F2F5EF" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="56" font-weight="800">健身记</text>
+    <text x="0" y="112" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="25">Fitness Mini Program</text>
+    <path d="M0 145H310" stroke="#C8F542" stroke-width="4"/>
+    <text x="0" y="188" fill="#F2F5EF" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="23">把动作、计划、训练记录与进步数据</text>
+    <text x="0" y="222" fill="#F2F5EF" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="23">放在一个轻量、可离线演示的小程序里。</text>
+    <text x="0" y="272" fill="#6B7268" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="18">51 exercises · 4 plans · local-first</text>
+  </g>
+
+  <g id="product-proof" transform="translate(550 42)">
+    <rect x="0" y="0" width="586" height="336" rx="20" fill="#181C17" stroke="#242A23" stroke-width="2"/>
+    <rect x="24" y="24" width="538" height="42" rx="10" fill="#1F241E"/>
+    <circle cx="45" cy="45" r="6" fill="#FF7A6E"/>
+    <circle cx="65" cy="45" r="6" fill="#FFB86B"/>
+    <circle cx="85" cy="45" r="6" fill="#C8F542"/>
+    <text x="112" y="51" fill="#9BA398" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="17">健身记 / today</text>
+
+    <rect x="24" y="88" width="252" height="104" rx="14" fill="#1F241E"/>
+    <text x="44" y="119" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="16">今日训练</text>
+    <text x="44" y="164" fill="#C8F542" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="38" font-weight="700">4</text>
+    <text x="89" y="164" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="17">组数</text>
+    <text x="182" y="164" fill="#C8F542" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="38" font-weight="700">38</text>
+    <text x="232" y="164" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="17">分钟</text>
+
+    <rect x="294" y="88" width="268" height="104" rx="14" fill="#1F241E"/>
+    <text x="314" y="119" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="16">近 7 天组数</text>
+    <path d="M322 168V151M358 168V133M394 168V143M430 168V116M466 168V148M502 168V128M538 168V102" stroke="#C8F542" stroke-width="12" stroke-linecap="round"/>
+    <path d="M314 180H542" stroke="#313830" stroke-width="2"/>
+
+    <rect x="24" y="216" width="538" height="96" rx="14" fill="#1F241E"/>
+    <text x="44" y="247" fill="#F2F5EF" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="18" font-weight="700">动作库 → 计划 → 记录 → 统计</text>
+    <path d="M44 276H526" stroke="#313830" stroke-width="2"/>
+    <circle cx="74" cy="276" r="10" fill="#C8F542"/>
+    <circle cx="219" cy="276" r="10" fill="#B79CFF"/>
+    <circle cx="364" cy="276" r="10" fill="#FFB86B"/>
+    <circle cx="509" cy="276" r="10" fill="#C8F542"/>
+    <path d="M84 276H209M229 276H354M374 276H499" stroke="#6B7268" stroke-width="2"/>
+    <text x="48" y="300" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="15">exercise</text>
+    <text x="198" y="300" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="15">plan</text>
+    <text x="346" y="300" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="15">log</text>
+    <text x="485" y="300" fill="#9BA398" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif" font-size="15">stats</text>
+  </g>
+</svg>
