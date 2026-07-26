@@ -51,18 +51,10 @@ function effective() {
   return pref === 'auto' ? systemTheme() : pref;
 }
 
-function nativeConfig(name) {
-  return NATIVE[name] || NATIVE.dark;
-}
-
-function applyPageChrome(name) {
-  const cfg = nativeConfig(name);
+// 把生效主题刷到原生组件（导航栏 / tabBar / 窗口背景）
+function applyToNative(name) {
+  const cfg = NATIVE[name] || NATIVE.dark;
   wx.setNavigationBarColor(cfg.nav);
-  wx.setBackgroundColor({ backgroundColor: cfg.pageBg, backgroundColorTop: cfg.pageBg, backgroundColorBottom: cfg.pageBg });
-}
-
-function applyTabBar(name) {
-  const cfg = nativeConfig(name);
   wx.setTabBarStyle(cfg.tab);
   TABS.forEach((t, i) => {
     wx.setTabBarItem({
@@ -71,12 +63,7 @@ function applyTabBar(name) {
       selectedIconPath: `images/tab_${t}${cfg.iconSuffix === '' ? '_active' : '_light_active'}.png`,
     });
   });
-}
-
-// 把生效主题刷到原生组件（导航栏 / tabBar / 窗口背景）
-function applyToNative(name) {
-  applyPageChrome(name);
-  applyTabBar(name);
+  wx.setBackgroundColor({ backgroundColor: cfg.pageBg, backgroundColorTop: cfg.pageBg, backgroundColorBottom: cfg.pageBg });
 }
 
 // 用户切换主题
@@ -102,4 +89,4 @@ function init() {
   }
 }
 
-module.exports = { preference, effective, setTheme, applyPageChrome, applyToNative, init };
+module.exports = { preference, effective, setTheme, applyToNative, init };

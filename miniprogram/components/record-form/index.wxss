@@ -91,7 +91,7 @@
   line-height: 1;
 }
 .step-btn::after { border: none; }
-.step-btn[disabled] { opacity: 0.35; }
+.step-btn--disabled { opacity: 0.35; }
 .step-val { width: 88rpx; text-align: center; font-size: 30rpx; color: var(--on-surface); }
 
 .unit { display: flex; align-items: center; gap: 12rpx; }

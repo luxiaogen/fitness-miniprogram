@@ -17,17 +17,17 @@
     <view class="row">
       <text class="k">组数</text>
       <view class="stepper">
-        <button class="step-btn" aria-label="减少组数" disabled="{{submitting || sets <= 1}}" data-field="sets" data-delta="-1" bindtap="step">−</button>
+        <button class="step-btn {{submitting || sets <= 1 ? 'step-btn--disabled' : ''}}" aria-label="减少组数" disabled="{{submitting || sets <= 1}}" data-field="sets" data-delta="-1" bindtap="step">−</button>
         <text class="step-val">{{sets}}</text>
-        <button class="step-btn" aria-label="增加组数" disabled="{{submitting || sets >= 100}}" data-field="sets" data-delta="1" bindtap="step">＋</button>
+        <button class="step-btn {{submitting || sets >= 100 ? 'step-btn--disabled' : ''}}" aria-label="增加组数" disabled="{{submitting || sets >= 100}}" data-field="sets" data-delta="1" bindtap="step">＋</button>
       </view>
     </view>
     <view class="row">
       <text class="k">每组次数</text>
       <view class="stepper">
-        <button class="step-btn" aria-label="减少每组次数" disabled="{{submitting || reps <= 1}}" data-field="reps" data-delta="-1" bindtap="step">−</button>
+        <button class="step-btn {{submitting || reps <= 1 ? 'step-btn--disabled' : ''}}" aria-label="减少每组次数" disabled="{{submitting || reps <= 1}}" data-field="reps" data-delta="-1" bindtap="step">−</button>
         <text class="step-val">{{reps}}</text>
-        <button class="step-btn" aria-label="增加每组次数" disabled="{{submitting || reps >= 1000}}" data-field="reps" data-delta="1" bindtap="step">＋</button>
+        <button class="step-btn {{submitting || reps >= 1000 ? 'step-btn--disabled' : ''}}" aria-label="增加每组次数" disabled="{{submitting || reps >= 1000}}" data-field="reps" data-delta="1" bindtap="step">＋</button>
       </view>
     </view>
     <view class="row">

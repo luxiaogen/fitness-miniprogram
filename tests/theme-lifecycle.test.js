@@ -52,6 +52,7 @@ test('themed pages restore light native chrome after a page switch', () => {
       backgroundColorTop: '#F5F6F2',
       backgroundColorBottom: '#F5F6F2',
     });
+    assert.equal(nativeCalls.navigation.length, 1);
 
     pageDefinition.onUnload.call(page);
   } finally {
