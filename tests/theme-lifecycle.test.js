@@ -32,6 +32,7 @@ test('themed pages restore light native chrome after a page switch', () => {
     };
 
     const { withTheme } = require('../miniprogram/utils/withTheme');
+    const themeService = require('../miniprogram/services/theme');
     withTheme({ data: {} });
 
     const page = {
@@ -53,6 +54,7 @@ test('themed pages restore light native chrome after a page switch', () => {
       backgroundColorBottom: '#F5F6F2',
     });
     assert.equal(nativeCalls.navigation.length, 1);
+    assert.equal(themeService.applyPageChrome, themeService.applyToNative);
 
     pageDefinition.onUnload.call(page);
   } finally {

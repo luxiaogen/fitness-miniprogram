@@ -66,6 +66,10 @@ function applyToNative(name) {
   wx.setBackgroundColor({ backgroundColor: cfg.pageBg, backgroundColorTop: cfg.pageBg, backgroundColorBottom: cfg.pageBg });
 }
 
+// DevTools can retain callers across partial hot reloads, so preserve the
+// former page-only entry point as an alias until the next full reload.
+const applyPageChrome = applyToNative;
+
 // 用户切换主题
 function setTheme(pref) {
   const normalized = normalizePreference(pref);
@@ -89,4 +93,4 @@ function init() {
   }
 }
 
-module.exports = { preference, effective, setTheme, applyToNative, init };
+module.exports = { preference, effective, setTheme, applyPageChrome, applyToNative, init };
