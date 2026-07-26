@@ -1,0 +1,62 @@
+<view class="page theme-{{theme}}" wx:if="{{plan}}">
+  <!-- 计划头部 -->
+  <view class="header">
+    <view class="name">{{plan.name}}</view>
+    <view class="desc">{{plan.desc}}</view>
+    <view class="tags">
+      <text class="tag-bp">{{plan.level}}</text>
+      <text class="tag-eq" wx:for="{{plan.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="card info-card">
+    <view class="info-row"><text class="k">适用人群</text><text class="v">{{plan.audience}}</text></view>
+    <view class="info-row"><text class="k">训练频率</text><text class="v">{{plan.daysPerWeek}} / 周</text></view>
+    <view class="info-row"><text class="k">循环方式</text><text class="v">{{plan.cycle}}</text></view>
+  </view>
+
+  <!-- 核心特点 -->
+  <view class="sec-title">核心特点</view>
+  <view class="card">
+    <view wx:for="{{plan.features}}" wx:key="index" class="feature">
+      <view class="feature-dot" />
+      <text class="feature-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 课表 -->
+  <view class="sec-title">完整课表 <text class="sec-sub">· 点击动作查看演示</text></view>
+  <view wx:for="{{plan.days}}" wx:key="name" wx:for-item="day" class="day-block">
+    <view class="day-head">
+      <text class="day-name">{{day.name}}</text>
+      <text class="day-focus">{{day.focus}}</text>
+    </view>
+    <view class="card day-card">
+      <view
+        wx:for="{{day.exercises}}"
+        wx:key="exId"
+        wx:for-item="ex"
+        class="ex-row"
+        data-id="{{ex.exId}}"
+        bindtap="onOpenExercise"
+      >
+        <image class="ex-thumb" src="{{ex.exercise.image}}" mode="aspectFill" lazy-load />
+        <view class="ex-info">
+          <view class="ex-name">{{ex.exercise.nameZh}}</view>
+          <view class="ex-spec">{{ex.specText}}</view>
+          <view wx:if="{{ex.note}}" class="ex-note">{{ex.note}}</view>
+        </view>
+        <view class="arrow-icon" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 应用按钮 -->
+  <view class="cta">
+    <button class="btn-primary {{applied ? 'btn-applied' : ''}}" bindtap="onToggleApply">
+      {{applied ? '✓ 已应用 · 点击取消' : '应用为我的训练方案'}}
+    </button>
+    <view class="cta-tip" wx:if="{{applied}}">应用后可在「记录」页将课表一键填入当日训练</view>
+  </view>
+</view>

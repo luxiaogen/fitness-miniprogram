@@ -1,0 +1,64 @@
+.date-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid var(--outline-variant);
+}
+.arrow {
+  width: 64rpx; height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arrow--disabled { opacity: 0.3; }
+.arrow-icon {
+  width: 18rpx; height: 18rpx;
+  border-top: 4rpx solid var(--on-surface);
+  border-right: 4rpx solid var(--on-surface);
+}
+.arrow-icon--left { transform: rotate(-135deg); }
+.arrow-icon--right { transform: rotate(45deg); }
+
+.cur { text-align: center; }
+.cur-label { font-size: 32rpx; font-weight: 600; color: var(--on-surface); }
+.cur-date { font-size: 22rpx; color: var(--on-surface-muted); margin-top: 2rpx; }
+
+/* 当前训练计划横幅：荧光描边传达「激活」语义 */
+.plan-banner {
+  background: var(--surface-container);
+  border: 1rpx solid var(--primary-border);
+  border-radius: 24rpx;
+  margin: 20rpx 24rpx 0;
+  padding: 20rpx 24rpx;
+}
+.pb-head { display: flex; align-items: center; justify-content: space-between; }
+.pb-name { font-size: 27rpx; font-weight: 600; color: var(--on-primary-container); }
+.pb-switch { font-size: 24rpx; color: var(--primary); padding: 4rpx 8rpx; }
+.pb-days {
+  white-space: nowrap;
+  margin-top: 16rpx;
+}
+.pb-day {
+  display: inline-flex;
+  flex-direction: column;
+  background: var(--surface-container-high);
+  border: 1rpx solid var(--outline);
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  margin-right: 16rpx;
+}
+.pb-day-name { font-size: 25rpx; font-weight: 600; color: var(--on-surface); }
+.pb-day-fill { font-size: 22rpx; color: var(--primary); margin-top: 6rpx; }
+
+.summary {
+  margin: 24rpx 24rpx 0;
+  font-size: 25rpx;
+  color: var(--on-surface-variant);
+  text-align: center;
+}
+
+.add-wrap {
+  padding: 28rpx 24rpx calc(28rpx + env(safe-area-inset-bottom));
+}

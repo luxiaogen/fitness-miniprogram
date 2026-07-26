@@ -1,0 +1,72 @@
+<view class="page theme-{{theme}}">
+  <!-- 日期切换栏 -->
+  <view class="date-bar">
+    <view class="arrow" data-d="-1" bindtap="onShiftDate">
+      <view class="arrow-icon arrow-icon--left" />
+    </view>
+    <view class="cur">
+      <view class="cur-label">{{dateText}}</view>
+      <view class="cur-date">{{date}}</view>
+    </view>
+    <view class="arrow {{isToday ? 'arrow--disabled' : ''}}" data-d="1" bindtap="onShiftDate">
+      <view class="arrow-icon arrow-icon--right" />
+    </view>
+  </view>
+
+  <!-- 当前训练计划横幅 -->
+  <view wx:if="{{currentPlan}}" class="plan-banner">
+    <view class="pb-head">
+      <text class="pb-name">📋 {{currentPlan.plan.name}}</text>
+      <text class="pb-switch" bindtap="onGoPlan">换计划</text>
+    </view>
+    <scroll-view scroll-x class="pb-days" enhanced show-scrollbar="{{false}}">
+      <view
+        wx:for="{{currentPlan.plan.days}}"
+        wx:key="name"
+        wx:for-item="day"
+        class="pb-day"
+        data-index="{{index}}"
+        bindtap="onFillPlanDay"
+      >
+        <text class="pb-day-name">{{day.name}}</text>
+        <text class="pb-day-fill">一键填入 ＋</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 当日训练列表 -->
+  <log-item
+    wx:for="{{records}}"
+    wx:key="_id"
+    record="{{item}}"
+deletable
+    bind:delete="onDelete"
+  />
+
+  <empty
+    wx:if="{{!records.length}}"
+    icon="🏋️"
+    text="当天还没有训练记录"
+    sub="点击下方按钮添加第一个动作"
+  />
+
+  <view wx:if="{{records.length}}" class="summary">
+    共 {{records.length}} 个动作 · {{totalSets}} 组 · 约 {{totalDuration}} 分钟
+  </view>
+
+  <view class="add-wrap">
+    <button class="btn-primary" bindtap="onOpenPicker">＋ 添加训练动作</button>
+  </view>
+
+  <ex-picker
+    visible="{{pickerVisible}}"
+    bind:close="onPickerClose"
+    bind:select="onPicked"
+  />
+  <record-form
+    visible="{{formVisible}}"
+    ex-id="{{pickedExId}}"
+    bind:close="onFormClose"
+    bind:confirm="onFormConfirm"
+  />
+</view>

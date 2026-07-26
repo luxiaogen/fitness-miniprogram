@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "动作详情",
+  "usingComponents": {
+    "record-form": "/components/record-form/index"
+  }
+}

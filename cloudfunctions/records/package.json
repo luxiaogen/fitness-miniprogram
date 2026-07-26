@@ -1,0 +1,9 @@
+{
+  "name": "records",
+  "version": "1.0.0",
+  "description": "训练记录查询 / 创建 / 删除",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

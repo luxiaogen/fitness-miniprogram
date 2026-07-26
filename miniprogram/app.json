@@ -1,0 +1,74 @@
+{
+  "pages": [
+    "pages/library/library",
+    "pages/plans/plans",
+    "pages/log/log",
+    "pages/calendar/calendar",
+    "pages/stats/stats",
+    "pages/plan-detail/plan-detail"
+  ],
+  "subpackages": [
+    {
+      "root": "packageDetail",
+      "name": "packageDetail",
+      "pages": [
+        "pages/detail/detail"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/library/library": {
+      "network": "all",
+      "packages": ["packageDetail"]
+    }
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#0E100E",
+    "navigationBarTitleText": "健身记",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0E100E",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#6B7268",
+    "selectedColor": "#C8F542",
+    "backgroundColor": "#141814",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/library/library",
+        "text": "动作库",
+        "iconPath": "images/tab_library.png",
+        "selectedIconPath": "images/tab_library_active.png"
+      },
+      {
+        "pagePath": "pages/plans/plans",
+        "text": "计划",
+        "iconPath": "images/tab_plan.png",
+        "selectedIconPath": "images/tab_plan_active.png"
+      },
+      {
+        "pagePath": "pages/log/log",
+        "text": "记录",
+        "iconPath": "images/tab_log.png",
+        "selectedIconPath": "images/tab_log_active.png"
+      },
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "日历",
+        "iconPath": "images/tab_calendar.png",
+        "selectedIconPath": "images/tab_calendar_active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "统计",
+        "iconPath": "images/tab_stats.png",
+        "selectedIconPath": "images/tab_stats_active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,62 @@
+<view class="page theme-{{theme}}" wx:if="{{exercise}}">
+  <!-- 演示动画：白底 GIF 置于媒体画布卡片（DESIGN.md · media-canvas 规范） -->
+  <view class="hero">
+    <view class="hero-canvas">
+      <image class="hero-img" src="{{gif}}" mode="aspectFit" show-menu-by-longpress />
+    </view>
+  </view>
+
+  <view class="head">
+    <view class="title">{{exercise.nameZh}}</view>
+    <view class="en">{{exercise.name}}</view>
+    <view class="tags">
+      <text class="tag-bp">{{exercise.bodyPartZh}}</text>
+      <text class="tag-eq">{{exercise.equipmentZh}}</text>
+      <text class="tag-target">目标：{{exercise.targetZh}}</text>
+      <text wx:for="{{exercise.secondary}}" wx:key="*this" class="tag-muted">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="sec-title">动作要领 <text class="sec-sub">（{{exercise.steps.length}} 步）</text></view>
+  <view class="card steps">
+    <view wx:for="{{exercise.steps}}" wx:key="index" class="step">
+      <view class="no">{{index + 1}}</view>
+      <text class="step-text">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="sec-title">我的标注 <text class="sec-sub">{{notes.length ? '· ' + notes.length + ' 条' : ''}}</text></view>
+  <view class="card">
+    <view wx:if="{{notes.length}}">
+      <view wx:for="{{notes}}" wx:key="_id" class="note-item">
+        <text class="note-text">{{item.text}}</text>
+        <view class="note-meta">
+          <text class="time">{{item.timeText}}</text>
+          <text class="del" data-id="{{item._id}}" bindtap="onDeleteNote">删除</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="note-empty">暂无标注，记录你的动作感受、发力要点或注意事项…</view>
+    <view class="note-input">
+      <input
+        class="input"
+        placeholder="添加标注，如：顶峰收缩 1 秒"
+        value="{{noteText}}"
+        bindinput="onNoteInput"
+        maxlength="120"
+      />
+      <button class="save-btn" size="mini" loading="{{saving}}" bindtap="onSaveNote">保存</button>
+    </view>
+  </view>
+
+  <view class="cta">
+    <button class="btn-primary" bindtap="onAddToday">＋ 加入今日训练</button>
+  </view>
+
+  <record-form
+    visible="{{formVisible}}"
+    ex-id="{{exercise.id}}"
+    bind:close="onFormClose"
+    bind:confirm="onFormConfirm"
+  />
+</view>

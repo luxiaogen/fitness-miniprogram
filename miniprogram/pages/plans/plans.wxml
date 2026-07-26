@@ -1,0 +1,29 @@
+<view class="page theme-{{theme}}">
+  <view class="intro">大众流行训练计划，选择适合你的方案开始系统训练</view>
+
+  <view
+    wx:for="{{plans}}"
+    wx:key="id"
+    class="plan-card"
+    hover-class="plan-card--hover"
+    data-id="{{item.id}}"
+    bindtap="onOpen"
+  >
+    <view class="head">
+      <view class="name">{{item.name}}</view>
+      <view wx:if="{{currentPlanId === item.id}}" class="badge">使用中</view>
+    </view>
+    <view class="desc">{{item.desc}}</view>
+    <view class="audience">适用：{{item.audience}}</view>
+    <view class="meta">
+      <text class="tag-bp">{{item.level}}</text>
+      <text class="tag-eq" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+    </view>
+    <view class="foot">
+      <text class="freq">{{item.daysPerWeek}} / 周 · {{item.dayCount}} 个训练日 · {{item.exerciseCount}} 个动作编排</text>
+      <view class="arrow-icon" />
+    </view>
+  </view>
+
+  <view class="footer-space" />
+</view>

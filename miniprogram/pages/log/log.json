@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "锻炼记录",
+  "usingComponents": {
+    "log-item": "/components/log-item/index",
+    "ex-picker": "/components/ex-picker/index",
+    "record-form": "/components/record-form/index",
+    "empty": "/components/empty/index"
+  }
+}

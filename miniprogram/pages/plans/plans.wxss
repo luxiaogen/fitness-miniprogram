@@ -1,0 +1,58 @@
+.intro {
+  font-size: 26rpx;
+  color: var(--on-surface-muted);
+  padding: 24rpx 28rpx 4rpx;
+}
+
+.plan-card {
+  background: var(--surface-container);
+  border: 1rpx solid var(--outline-variant);
+  border-radius: 24rpx;
+  margin: 20rpx 24rpx 0;
+  padding: 28rpx;
+}
+.plan-card--hover { opacity: 0.8; }
+
+.head { display: flex; align-items: center; justify-content: space-between; }
+.name { font-size: 34rpx; font-weight: 700; color: var(--on-surface); }
+.badge {
+  font-size: 22rpx;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: 9999rpx;
+  padding: 4rpx 16rpx;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.desc {
+  font-size: 26rpx;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  margin-top: 12rpx;
+}
+.audience {
+  font-size: 24rpx;
+  color: var(--on-surface-muted);
+  margin-top: 12rpx;
+}
+
+.meta { display: flex; gap: 12rpx; margin-top: 16rpx; flex-wrap: wrap; }
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--outline-variant);
+}
+.freq { font-size: 24rpx; color: var(--primary); }
+.arrow-icon {
+  width: 16rpx; height: 16rpx;
+  border-top: 3rpx solid var(--on-surface-muted);
+  border-right: 3rpx solid var(--on-surface-muted);
+  transform: rotate(45deg);
+}
+
+.footer-space { height: 40rpx; }

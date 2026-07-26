@@ -1,0 +1,20 @@
+<view class="mask {{visible ? 'mask--show' : ''}}" bindtap="onClose" />
+<view class="sheet {{visible ? 'sheet--show' : ''}}" catchtouchmove="noop">
+  <view class="sheet-head">
+    <text class="t">选择训练动作</text>
+    <view class="x" bindtap="onClose">✕</view>
+  </view>
+  <view class="search">
+    <input class="search-input" placeholder="搜索动作" value="{{keyword}}" bindinput="onSearchInput" />
+  </view>
+  <scroll-view scroll-y class="list">
+    <ex-item
+      wx:for="{{list}}"
+      wx:key="id"
+      exercise="{{item}}"
+      size="small"
+      bind:select="onSelect"
+    />
+    <view wx:if="{{!list.length}}" class="none">无匹配动作</view>
+  </scroll-view>
+</view>

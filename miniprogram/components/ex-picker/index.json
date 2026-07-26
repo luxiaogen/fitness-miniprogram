@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ex-item": "../ex-item/index"
+  }
+}

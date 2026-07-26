@@ -1,0 +1,72 @@
+/* 详情页：白底 GIF 置于「媒体画布」卡片，深色页面中的有意焦点 */
+.hero { padding: 24rpx 24rpx 0; }
+.hero-canvas {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: center;
+  padding: 24rpx 0;
+}
+.hero-img { width: 400rpx; height: 400rpx; border-radius: 16rpx; }
+
+.head {
+  padding: 28rpx 32rpx;
+  border-bottom: 1rpx solid var(--outline-variant);
+}
+.title { font-size: 44rpx; font-weight: 700; color: var(--on-surface); letter-spacing: -0.01em; }
+.en { color: var(--on-surface-muted); font-size: 26rpx; text-transform: capitalize; margin: 6rpx 0 20rpx; }
+.tags { display: flex; gap: 12rpx; flex-wrap: wrap; }
+
+.steps { margin-top: 0; }
+.step { display: flex; gap: 20rpx; padding: 14rpx 0; }
+.no {
+  width: 40rpx; height: 40rpx;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+.step-text { font-size: 27rpx; line-height: 1.6; color: var(--on-surface-variant); flex: 1; }
+
+/* 标注便签：琥珀色容器，保持「便签纸」语义 */
+.note-item {
+  background: var(--tertiary-container);
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+.note-text { font-size: 27rpx; line-height: 1.5; color: var(--on-tertiary-container); }
+.note-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12rpx; }
+.time { font-size: 22rpx; color: var(--tertiary); }
+.del { font-size: 24rpx; color: var(--error); padding: 4rpx 12rpx; }
+.note-empty { font-size: 26rpx; color: var(--on-surface-muted); padding: 8rpx 0 20rpx; }
+
+.note-input { display: flex; gap: 16rpx; margin-top: 16rpx; }
+.input {
+  flex: 1;
+  background: var(--surface-container-high);
+  border: 1rpx solid var(--outline);
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  color: var(--on-surface);
+}
+.save-btn {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: 9999rpx;
+  margin: 0;
+  line-height: 2.4;
+  padding: 0 32rpx;
+}
+
+.cta {
+  padding: 20rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+}

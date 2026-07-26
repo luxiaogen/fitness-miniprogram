@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "动作库",
+  "usingComponents": {
+    "ex-item": "/components/ex-item/index",
+    "empty": "/components/empty/index"
+  }
+}

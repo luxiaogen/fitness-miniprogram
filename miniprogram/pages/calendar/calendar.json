@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "锻炼日历",
+  "usingComponents": {
+    "log-item": "/components/log-item/index",
+    "empty": "/components/empty/index"
+  }
+}

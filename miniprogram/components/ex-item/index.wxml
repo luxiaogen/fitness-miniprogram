@@ -1,0 +1,15 @@
+<view class="ex-item ex-item--{{size}}" hover-class="ex-item--hover" bindtap="onTap">
+  <image class="thumb" src="{{exercise.image}}" mode="aspectFill" lazy-load />
+  <view class="info">
+    <view class="name">
+      {{exercise.nameZh}}
+      <view wx:if="{{noted}}" class="noted-dot" />
+    </view>
+    <view class="en">{{exercise.name}}</view>
+    <view class="tags">
+      <text class="tag-bp">{{exercise.bodyPartZh}}</text>
+      <text class="tag-eq">{{exercise.equipmentZh}}</text>
+    </view>
+  </view>
+  <view class="arrow-icon" />
+</view>

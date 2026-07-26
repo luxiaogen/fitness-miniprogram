@@ -1,0 +1,121 @@
+/* app.wxss - 全局样式（DESIGN.md「Volt Gym」双主题 token 层）
+ * 机制：.theme-dark / .theme-light 定义两套变量，页面根节点挂 theme-<name> class，
+ * 全部样式经 var(--token) 取色；主题切换由 services/theme.js 驱动。 */
+
+/* ---------------- 深色主题（默认，Volt Gym 暗夜伏特） ---------------- */
+.theme-dark {
+  --surface: #0E100E;
+  --surface-dim: #0A0C0A;
+  --surface-container: #181C17;
+  --surface-container-high: #1F241E;
+  --surface-container-highest: #272D26;
+  --on-surface: #F2F5EF;
+  --on-surface-variant: #9BA398;
+  --on-surface-muted: #6B7268;
+  --on-surface-dim: #4A5148;
+  --outline: #313830;
+  --outline-variant: #242A23;
+  --primary: #C8F542;
+  --primary-pressed: #B4E13A;
+  --on-primary: #17200A;
+  --primary-container: #263207;
+  --on-primary-container: #DDFB8A;
+  --primary-border: rgba(200, 245, 66, 0.25);
+  --secondary: #B79CFF;
+  --secondary-container: #2B2440;
+  --tertiary: #FFB86B;
+  --tertiary-container: #3A2A17;
+  --on-tertiary-container: #FFD9A8;
+  --error: #FF7A6E;
+  --error-container: #3B1B18;
+  --mask: rgba(0, 0, 0, 0.6);
+  --chart-fill: linear-gradient(180deg, #DDFB8A, #C8F542);
+  --chart-fill-x: linear-gradient(90deg, #DDFB8A, #C8F542);
+}
+
+/* ---------------- 浅色主题（Volt Gym Light） ---------------- */
+.theme-light {
+  --surface: #F5F6F2;
+  --surface-dim: #EEF0EA;
+  --surface-container: #FFFFFF;
+  --surface-container-high: #F0F2EC;
+  --surface-container-highest: #E6E9E0;
+  --on-surface: #1A1E16;
+  --on-surface-variant: #5A6156;
+  --on-surface-muted: #8A9184;
+  --on-surface-dim: #B8BDB0;
+  --outline: #D8DCD0;
+  --outline-variant: #E7EAE0;
+  --primary: #558B00;
+  --primary-pressed: #477500;
+  --on-primary: #FFFFFF;
+  --primary-container: #E4F5C2;
+  --on-primary-container: #2E4A00;
+  --primary-border: rgba(85, 139, 0, 0.3);
+  --secondary: #7A5AF5;
+  --secondary-container: #F1EDFD;
+  --tertiary: #C26A1B;
+  --tertiary-container: #FFF3E8;
+  --on-tertiary-container: #8A5A20;
+  --error: #E5483C;
+  --error-container: #FDECEA;
+  --mask: rgba(0, 0, 0, 0.45);
+  --chart-fill: linear-gradient(180deg, #8BC53F, #558B00);
+  --chart-fill-x: linear-gradient(90deg, #8BC53F, #558B00);
+}
+
+/* ---------------- 页面基底 ---------------- */
+/* page 背景保持透明：橡皮筋区域由 wx.setBackgroundColor 按主题动态设置，
+ * 页面内容由根节点 theme-<name> class 的 min-height:100vh + var(--surface) 覆盖 */
+page {
+  font-size: 28rpx;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+/* 根节点主题容器：接管整页背景与文字色 */
+.theme-dark, .theme-light {
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+/* 通用卡片：明度阶梯 + 发丝边框（深色系统禁用投影） */
+.card {
+  background: var(--surface-container);
+  border: 1rpx solid var(--outline-variant);
+  border-radius: 24rpx;
+  margin: 20rpx 24rpx;
+  padding: 28rpx;
+}
+
+/* 主按钮：荧光绿胶囊，每屏至多一个 */
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: 9999rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.btn-primary.button-hover { background: var(--primary-pressed); }
+
+/* 幽灵按钮：次级操作 */
+.btn-ghost {
+  background: var(--surface-container-high);
+  color: var(--primary);
+  border-radius: 9999rpx;
+  font-size: 30rpx;
+}
+
+/* 语义标签三色：部位=绿 / 器械=紫 / 目标=琥珀 */
+.tag-bp { font-size: 22rpx; color: var(--on-primary-container); background: var(--primary-container); border-radius: 8rpx; padding: 4rpx 12rpx; }
+.tag-eq { font-size: 22rpx; color: var(--secondary); background: var(--secondary-container); border-radius: 8rpx; padding: 4rpx 12rpx; }
+.tag-target { font-size: 22rpx; color: var(--tertiary); background: var(--tertiary-container); border-radius: 8rpx; padding: 4rpx 12rpx; }
+.tag-muted { font-size: 22rpx; color: var(--on-surface-variant); background: var(--surface-container-high); border-radius: 8rpx; padding: 4rpx 12rpx; }
+
+/* 章节标题 */
+.sec-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin: 40rpx 24rpx 16rpx;
+  color: var(--on-surface);
+}
+.sec-title .sec-sub { font-size: 24rpx; color: var(--on-surface-muted); font-weight: 400; }

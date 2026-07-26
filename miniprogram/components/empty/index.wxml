@@ -1,0 +1,5 @@
+<view class="empty">
+  <view class="icon">{{icon}}</view>
+  <view class="text">{{text}}</view>
+  <view wx:if="{{sub}}" class="sub">{{sub}}</view>
+</view>

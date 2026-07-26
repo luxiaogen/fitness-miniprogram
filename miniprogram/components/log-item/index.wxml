@@ -1,0 +1,14 @@
+<view wx:if="{{exercise}}" class="log-item {{compact ? 'log-item--compact' : ''}}">
+  <image class="thumb" src="{{exercise.image}}" mode="aspectFill" lazy-load />
+  <view class="info">
+    <view class="name">{{exercise.nameZh}}</view>
+    <view class="spec">
+      {{record.sets}} 组 × {{record.reps}} 次{{record.weight ? ' × ' + record.weight + 'kg' : ' · 自重'}}
+    </view>
+    <view wx:if="{{record.note && !compact}}" class="note">备注：{{record.note}}</view>
+  </view>
+  <view class="ops">
+    <text wx:if="{{!compact}}" class="dur">约 {{record.duration}} 分钟</text>
+    <text wx:if="{{deletable}}" class="del" catchtap="onDelete">删除</text>
+  </view>
+</view>
