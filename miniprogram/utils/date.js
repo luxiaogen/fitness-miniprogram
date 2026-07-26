@@ -1,12 +1,16 @@
 // utils/date.js - 日期工具
 const WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
 const pad = n => String(n).padStart(2, '0');
+const CHINA_TIME_OFFSET_MS = 8 * 60 * 60 * 1000;
 
 function dstr(d) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function todayStr() { return dstr(new Date()); }
+// Training dates use China Standard Time everywhere, including cloud functions.
+function todayStr(now = new Date()) {
+  return new Date(now.getTime() + CHINA_TIME_OFFSET_MS).toISOString().slice(0, 10);
+}
 
 function shiftDate(ds, days) {
   const d = new Date(ds + 'T00:00:00');
@@ -23,7 +27,7 @@ function dateLabel(ds) {
 }
 
 // 本周起止（周一为一周开始）
-function weekRange(base = new Date()) {
+function weekRange(base = new Date(`${todayStr()}T00:00:00`)) {
   const day = base.getDay() || 7;
   const start = new Date(base);
   start.setDate(base.getDate() - day + 1);
@@ -33,7 +37,7 @@ function weekRange(base = new Date()) {
 }
 
 // 本月起止
-function monthRange(base = new Date()) {
+function monthRange(base = new Date(`${todayStr()}T00:00:00`)) {
   return {
     start: dstr(new Date(base.getFullYear(), base.getMonth(), 1)),
     end: dstr(new Date(base.getFullYear(), base.getMonth() + 1, 0)),

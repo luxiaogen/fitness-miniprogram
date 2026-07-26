@@ -30,11 +30,11 @@ const TABS = ['library', 'plan', 'log', 'calendar', 'stats'];
 const VALID_PREFERENCES = ['light', 'dark', 'auto'];
 
 function normalizePreference(value) {
-  return VALID_PREFERENCES.includes(value) ? value : 'auto';
+  return VALID_PREFERENCES.includes(value) ? value : 'dark';
 }
 
 function preference() {
-  try { return normalizePreference(wx.getStorageSync(STORAGE_KEY)); } catch (e) { return 'auto'; }
+  try { return normalizePreference(wx.getStorageSync(STORAGE_KEY)); } catch (e) { return 'dark'; }
 }
 
 function systemTheme() {

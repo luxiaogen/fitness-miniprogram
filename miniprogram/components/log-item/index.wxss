@@ -46,4 +46,15 @@
   flex-shrink: 0;
 }
 .dur { font-size: 22rpx; color: var(--on-surface-muted); }
-.del { font-size: 26rpx; color: var(--error); padding: 8rpx; }
+.del {
+  min-width: 88rpx;
+  min-height: 88rpx;
+  padding: 0 12rpx;
+  margin: -16rpx -12rpx -16rpx 0;
+  border: none;
+  background: transparent;
+  color: var(--error);
+  font-size: 26rpx;
+  line-height: 88rpx;
+}
+.del::after { border: none; }

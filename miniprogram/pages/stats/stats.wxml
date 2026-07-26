@@ -1,8 +1,8 @@
 <view class="page theme-{{theme}}">
   <!-- 周期切换 -->
   <view class="seg">
-    <view class="seg-item {{period === 'week' ? 'seg-item--active' : ''}}" data-p="week" bindtap="onPeriodTap">本周</view>
-    <view class="seg-item {{period === 'month' ? 'seg-item--active' : ''}}" data-p="month" bindtap="onPeriodTap">本月</view>
+    <button class="seg-item {{period === 'week' ? 'seg-item--active' : ''}}" aria-label="查看本周统计" data-p="week" bindtap="onPeriodTap">本周</button>
+    <button class="seg-item {{period === 'month' ? 'seg-item--active' : ''}}" aria-label="查看本月统计" data-p="month" bindtap="onPeriodTap">本月</button>
   </view>
 
   <!-- 指标卡片 -->
@@ -53,16 +53,17 @@
   <view class="sec-title">外观</view>
   <view class="card theme-card">
     <view class="theme-options">
-      <view
+      <button
         wx:for="{{themeOptions}}"
         wx:key="k"
         class="theme-option {{themePref === item.k ? 'theme-option--active' : ''}}"
+        aria-label="切换为{{item.label}}主题"
         data-p="{{item.k}}"
         bindtap="onThemePrefTap"
       >
         <view class="theme-icon">{{item.icon}}</view>
         <view class="theme-label">{{item.label}}</view>
-      </view>
+      </button>
     </view>
   </view>
 </view>

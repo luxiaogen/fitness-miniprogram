@@ -8,6 +8,14 @@
 const app = getApp();
 
 const cloudReady = () => !!(app && app.globalData && app.globalData.cloudReady);
+const cloudConfigured = () => !!(app && app.globalData && app.globalData.cloudConfigured);
+
+class CloudApplicationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'CloudApplicationError';
+  }
+}
 
 /**
  * 调用云函数并解包统一返回结构 { code, data, msg }
@@ -17,7 +25,7 @@ const cloudReady = () => !!(app && app.globalData && app.globalData.cloudReady);
 async function call(name, data) {
   const res = await wx.cloud.callFunction({ name, data });
   const result = res.result || {};
-  if (result.code !== 0) throw new Error(result.msg || '云函数返回异常');
+  if (result.code !== 0) throw new CloudApplicationError(result.msg || '云函数返回异常');
   return result.data;
 }
 
@@ -45,12 +53,23 @@ function localId() {
   return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+function paged(items, { offset = 0, pageSize = 100 } = {}) {
+  const start = Number(offset);
+  const size = Number(pageSize);
+  if (!Number.isInteger(start) || start < 0 || !Number.isInteger(size) || size < 1 || size > 100) {
+    throw new Error('分页参数无效');
+  }
+  const page = items.slice(start, start + size);
+  return { items: page, hasMore: start + page.length < items.length };
+}
+
 const localImpl = {
   records: {
-    async list({ date, start, end }) {
-      return readLocal(LOCAL_KEYS.records)
+    async list({ date, start, end, offset, pageSize }) {
+      const records = readLocal(LOCAL_KEYS.records)
         .filter(r => date ? r.date === date : (r.date >= start && r.date <= end))
         .sort((a, b) => a.createdAt - b.createdAt);
+      return paged(records, { offset, pageSize });
     },
     async create({ record }) {
       const all = readLocal(LOCAL_KEYS.records);
@@ -58,6 +77,20 @@ const localImpl = {
       all.push(item);
       writeLocal(LOCAL_KEYS.records, all);
       return item;
+    },
+    async createMany({ records }) {
+      if (!Array.isArray(records) || !records.length || records.length > 20) {
+        throw new Error('批量训练记录数量无效');
+      }
+      const all = readLocal(LOCAL_KEYS.records);
+      const createdAt = Date.now();
+      const items = records.map((record, index) => ({
+        ...record,
+        _id: localId(),
+        createdAt: createdAt + index,
+      }));
+      writeLocal(LOCAL_KEYS.records, all.concat(items));
+      return items;
     },
     async remove({ id }) {
       const all = readLocal(LOCAL_KEYS.records);
@@ -67,11 +100,17 @@ const localImpl = {
     },
   },
   notes: {
-    async list({ exId }) {
-      return readLocal(LOCAL_KEYS.notes)
+    async list({ exId, offset, pageSize }) {
+      const notes = readLocal(LOCAL_KEYS.notes)
         .filter(n => n.exId === exId)
+        .sort((a, b) => b.createdAt - a.createdAt);
+      return paged(notes, { offset, pageSize });
+    },
+    async summary({ offset, pageSize }) {
+      const exIds = readLocal(LOCAL_KEYS.notes)
         .sort((a, b) => b.createdAt - a.createdAt)
-        .slice(0, 50);
+        .map(note => note.exId);
+      return paged(exIds, { offset, pageSize });
     },
     async create({ exId, text }) {
       const all = readLocal(LOCAL_KEYS.notes);
@@ -95,10 +134,12 @@ const localImpl = {
  * @param {object} payload { action: 'list'|'create'|'remove', ... }
  */
 async function request(resource, payload) {
-  if (cloudReady()) {
+  if (cloudConfigured()) {
+    if (!cloudReady()) throw new Error('云服务初始化失败，请检查环境配置后重试');
     try {
       return await call(resource, payload);
     } catch (e) {
+      if (e instanceof CloudApplicationError) throw e;
       // Do not silently write to local storage after a cloud failure: that
       // creates two divergent copies of a user's data.
       console.error(`[cloud] ${resource}.${payload.action} 云端请求失败`, e);
@@ -110,4 +151,18 @@ async function request(resource, payload) {
   return fn(payload);
 }
 
-module.exports = { request, cloudReady };
+async function listAll(resource, payload, pageSize = 100) {
+  const items = [];
+  let offset = 0;
+
+  while (true) {
+    const page = await request(resource, { ...payload, offset, pageSize });
+    if (!page || !Array.isArray(page.items)) throw new Error('分页数据格式异常');
+    items.push(...page.items);
+    if (!page.hasMore) return items;
+    if (!page.items.length) throw new Error('分页数据异常');
+    offset += page.items.length;
+  }
+}
+
+module.exports = { request, listAll, cloudReady, cloudConfigured, CloudApplicationError };

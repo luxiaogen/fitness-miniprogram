@@ -54,9 +54,10 @@ CLOUD_ENV: ''
 1. 在微信开发者工具中开通云开发并创建环境。
 2. 把环境 ID 写入 `miniprogram/env.js` 的 `CLOUD_ENV`。
 3. 创建 `users`、`records`、`notes` 三个云数据库集合，权限设为“仅创建者可读写”。
-4. 分别部署 `cloudfunctions/login`、`cloudfunctions/records`、`cloudfunctions/notes`。
+4. 创建联合索引：`records` 使用 `(_openid, date, createdAt)`；`notes` 使用 `(_openid, exId, createdAt)` 和 `(_openid, createdAt)`。
+5. 分别部署 `cloudfunctions/login`、`cloudfunctions/records`、`cloudfunctions/notes`。
 
-云端请求失败时，应用会明确提示错误，不会把写入操作偷偷切换到本地，避免产生两份不一致的数据。
+云端请求或静默登录失败时，应用会明确提示错误，不会把写入操作偷偷切换到本地，避免产生两份不一致的数据。训练日期统一按中国标准时间处理。
 
 ### 项目结构
 
@@ -82,13 +83,26 @@ CLOUD_ENV: ''
 - **小程序原生能力**：使用分包、预下载、云函数和云数据库。
 - **服务层复用**：页面不直接依赖云函数协议，记录与标注通过统一 service 访问。
 - **输入安全**：客户端和云函数双重校验日期、数值、文本长度和用户数据归属。
+- **完整聚合**：记录与标注会分页读取；统计不会因单页上限而静默漏算。
+- **原子填入**：训练计划在本地模式一次写入，在云端模式使用事务写入，避免半套计划残留。
+
+### 开发校验
+
+项目不依赖额外测试框架；可使用 Node 20+ 运行静态校验与回归测试：
+
+```bash
+npm run verify
+```
+
+GitHub Actions 会在推送和 Pull Request 时运行相同校验。
 
 ### 当前边界
 
 - 动作库和训练计划是随版本发布的静态数据，不支持在线编辑。
 - 统计目前由前端聚合周期内记录，适合 MVP 阶段的个人数据量。
 - `CLOUD_ENV` 默认为空；生产使用前需要配置自己的 AppID、云环境和数据库集合。
-- 仓库未附带小程序隐私协议与审核材料，提交审核前请按实际数据处理情况补充。
+- 已有本地数据不会自动迁移到后来配置的云环境；发布迁移功能前，应先提供用户确认、备份与导入流程。
+- 仓库未附带可直接提交的隐私协议与审核材料。请按实际运营主体、联系方式、用途、留存期限和用户权利补充，不能默认声明“无收集”。
 
 ### 相关文档
 
@@ -139,9 +153,10 @@ To persist data across devices:
 1. Enable Cloud Development and create an environment in WeChat DevTools.
 2. Set the environment ID as `CLOUD_ENV` in `miniprogram/env.js`.
 3. Create `users`, `records`, and `notes` collections with creator-only read/write permissions.
-4. Deploy `cloudfunctions/login`, `cloudfunctions/records`, and `cloudfunctions/notes`.
+4. Create composite indexes: `(_openid, date, createdAt)` for `records`; `(_openid, exId, createdAt)` and `(_openid, createdAt)` for `notes`.
+5. Deploy `cloudfunctions/login`, `cloudfunctions/records`, and `cloudfunctions/notes`.
 
-Cloud request failures are surfaced to the user instead of silently switching a write to local storage. This prevents two divergent copies of the same data.
+Cloud request and silent-login failures are surfaced to the user instead of silently switching a write to local storage. This prevents two divergent copies of the same data. Training dates use China Standard Time consistently.
 
 ### Repository layout
 
@@ -167,13 +182,26 @@ Cloud request failures are surfaced to the user instead of silently switching a 
 - **Native Mini Program capabilities**: subpackages, preloading, cloud functions, and cloud database.
 - **Reusable service layer**: pages consume stable services instead of calling cloud functions directly.
 - **Input safety**: dates, numeric fields, text length, and user ownership are validated on both client and server.
+- **Complete aggregation**: records and notes are paginated so statistics do not silently omit data after a single-page limit.
+- **Atomic plan fills**: plan days are written once in local mode and transactionally in cloud mode, preventing partial routines.
+
+### Development checks
+
+The repository uses Node 20+ built-ins only for static checks and regression tests:
+
+```bash
+npm run verify
+```
+
+GitHub Actions runs the same command on pushes and pull requests.
 
 ### Current boundaries
 
 - The exercise library and training plans are static release data; they are not editable online.
 - Statistics are currently aggregated on the client, which is appropriate for MVP-scale personal data.
 - `CLOUD_ENV` is empty by default; production use requires your own AppID, cloud environment, and collections.
-- Privacy-policy and review materials are not included; prepare them according to your actual data practices before submission.
+- Existing local data is not automatically migrated when cloud mode is enabled later. A migration feature needs explicit consent, backup, and import support.
+- A submission-ready privacy policy and review materials are not included. Complete them with the real operator, contact, purpose, retention, and user-rights details; do not default to a “no collection” claim.
 
 ### Documentation
 

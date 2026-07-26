@@ -7,12 +7,19 @@
   border-bottom: 1rpx solid var(--outline-variant);
 }
 .arrow {
-  width: 64rpx; height: 64rpx;
+  width: 88rpx; height: 88rpx;
+  min-width: 88rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
-.arrow--disabled { opacity: 0.3; }
+.arrow::after { border: none; }
+.arrow--disabled { opacity: 0.3; background: transparent; }
 .arrow-icon {
   width: 18rpx; height: 18rpx;
   border-top: 4rpx solid var(--on-surface);
@@ -35,7 +42,18 @@
 }
 .pb-head { display: flex; align-items: center; justify-content: space-between; }
 .pb-name { font-size: 27rpx; font-weight: 600; color: var(--on-primary-container); }
-.pb-switch { font-size: 24rpx; color: var(--primary); padding: 4rpx 8rpx; }
+.pb-switch {
+  min-width: 88rpx;
+  min-height: 88rpx;
+  padding: 0 16rpx;
+  margin: -16rpx -16rpx -16rpx 0;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 24rpx;
+  line-height: 88rpx;
+}
+.pb-switch::after { border: none; }
 .pb-days {
   white-space: nowrap;
   margin-top: 16rpx;
@@ -51,6 +69,7 @@
 }
 .pb-day-name { font-size: 25rpx; font-weight: 600; color: var(--on-surface); }
 .pb-day-fill { font-size: 22rpx; color: var(--primary); margin-top: 6rpx; }
+.pb-day--disabled { opacity: 0.55; }
 
 .summary {
   margin: 24rpx 24rpx 0;

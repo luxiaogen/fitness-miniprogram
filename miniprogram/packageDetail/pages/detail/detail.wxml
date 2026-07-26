@@ -32,7 +32,7 @@
         <text class="note-text">{{item.text}}</text>
         <view class="note-meta">
           <text class="time">{{item.timeText}}</text>
-          <text class="del" data-id="{{item._id}}" bindtap="onDeleteNote">删除</text>
+          <button class="del" aria-label="删除这条标注" data-id="{{item._id}}" bindtap="onDeleteNote">删除</button>
         </view>
       </view>
     </view>
@@ -40,12 +40,13 @@
     <view class="note-input">
       <input
         class="input"
-        placeholder="添加标注，如：顶峰收缩 1 秒"
+        aria-label="添加动作标注"
+        placeholder="添加标注，如：顶峰收缩 1 秒…"
         value="{{noteText}}"
         bindinput="onNoteInput"
         maxlength="120"
       />
-      <button class="save-btn" size="mini" loading="{{saving}}" bindtap="onSaveNote">保存</button>
+      <button class="save-btn" size="mini" loading="{{saving}}" disabled="{{saving}}" bindtap="onSaveNote">保存</button>
     </view>
   </view>
 
@@ -55,6 +56,7 @@
 
   <record-form
     visible="{{formVisible}}"
+    submitting="{{formSubmitting}}"
     ex-id="{{exercise.id}}"
     bind:close="onFormClose"
     bind:confirm="onFormConfirm"

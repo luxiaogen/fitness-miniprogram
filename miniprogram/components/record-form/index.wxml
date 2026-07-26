@@ -2,7 +2,7 @@
 <view class="sheet {{visible ? 'sheet--show' : ''}}" catchtouchmove="noop">
   <view class="sheet-head">
     <text class="t">配置训练参数</text>
-    <view class="x" bindtap="onClose">✕</view>
+    <button class="x" aria-label="关闭训练参数配置" disabled="{{submitting}}" bindtap="onClose">✕</button>
   </view>
 
   <scroll-view scroll-y class="body">
@@ -17,36 +17,38 @@
     <view class="row">
       <text class="k">组数</text>
       <view class="stepper">
-        <view class="step-btn" data-field="sets" data-delta="-1" bindtap="step">−</view>
+        <button class="step-btn" aria-label="减少组数" disabled="{{submitting || sets <= 1}}" data-field="sets" data-delta="-1" bindtap="step">−</button>
         <text class="step-val">{{sets}}</text>
-        <view class="step-btn" data-field="sets" data-delta="1" bindtap="step">＋</view>
+        <button class="step-btn" aria-label="增加组数" disabled="{{submitting || sets >= 100}}" data-field="sets" data-delta="1" bindtap="step">＋</button>
       </view>
     </view>
     <view class="row">
       <text class="k">每组次数</text>
       <view class="stepper">
-        <view class="step-btn" data-field="reps" data-delta="-1" bindtap="step">−</view>
+        <button class="step-btn" aria-label="减少每组次数" disabled="{{submitting || reps <= 1}}" data-field="reps" data-delta="-1" bindtap="step">−</button>
         <text class="step-val">{{reps}}</text>
-        <view class="step-btn" data-field="reps" data-delta="1" bindtap="step">＋</view>
+        <button class="step-btn" aria-label="增加每组次数" disabled="{{submitting || reps >= 1000}}" data-field="reps" data-delta="1" bindtap="step">＋</button>
       </view>
     </view>
     <view class="row">
       <text class="k">重量（0 为自重）</text>
       <view class="unit">
-        <input class="unit-input" type="digit" value="{{weight}}" data-field="weight" bindinput="onNumberInput" />
+        <input class="unit-input" aria-label="重量，单位千克，零表示自重" disabled="{{submitting}}" type="digit" value="{{weight}}" data-field="weight" bindinput="onNumberInput" />
         <text class="unit-text">kg</text>
       </view>
     </view>
     <view class="row">
       <text class="k">预计时长</text>
       <view class="unit">
-        <input class="unit-input" type="number" value="{{duration}}" data-field="duration" bindinput="onNumberInput" />
+        <input class="unit-input" aria-label="预计时长，单位分钟" disabled="{{submitting}}" type="number" value="{{duration}}" data-field="duration" bindinput="onNumberInput" />
         <text class="unit-text">分钟</text>
       </view>
     </view>
     <textarea
       class="note"
-      placeholder="备注（可选）：如发力感受、组间休息、注意事项"
+      aria-label="训练备注，可选"
+      disabled="{{submitting}}"
+      placeholder="备注（可选）：如发力感受、组间休息、注意事项…"
       value="{{note}}"
       bindinput="onNoteInput"
       maxlength="200"
@@ -54,6 +56,6 @@
   </scroll-view>
 
   <view class="foot">
-    <button class="btn-primary" bindtap="onConfirm">确定添加</button>
+    <button class="btn-primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onConfirm">确定添加</button>
   </view>
 </view>

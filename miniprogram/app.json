@@ -18,7 +18,7 @@
   ],
   "preloadRule": {
     "pages/library/library": {
-      "network": "all",
+      "network": "wifi",
       "packages": ["packageDetail"]
     }
   },

@@ -24,9 +24,9 @@ function query(bodyPart = 'all', keyword = '') {
   );
 }
 
-// 演示 GIF 地址：32 色压缩后存放于 packageDetail 分包（38 个共 ~1.9MB，单分包上限 2MB 内）。
+// 演示 GIF 地址：32 色压缩后存放于 packageDetail 分包（51 个共 ~1.9MB，单分包上限 2MB 内）。
 // image 组件播放 GIF 为小程序原生成熟能力，模拟器与真机行为一致；
-// 分包已配置 preloadRule，进入动作库时预下载，打开详情页无感知。
+// 分包仅在 Wi-Fi 下预下载；移动网络按需加载以避免额外流量消耗。
 // 后续开通云存储后，仅需把本函数返回值换成 fileID/HTTPS 地址即可平滑切换 CDN。
 function gifUrl(exercise) {
   return `/packageDetail/assets/gifs/${exercise.gifFile.split('/')[1]}`;

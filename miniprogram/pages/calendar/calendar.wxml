@@ -1,9 +1,9 @@
 <view class="page theme-{{theme}}">
   <view class="card cal-card">
     <view class="cal-head">
-      <view class="arrow" data-d="-1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--left" /></view>
+      <button class="arrow" aria-label="查看上个月" data-d="-1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--left" /></button>
       <view class="month">{{monthText}}</view>
-      <view class="arrow" data-d="1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--right" /></view>
+      <button class="arrow" aria-label="查看下个月" data-d="1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--right" /></button>
     </view>
     <view class="grid">
       <view wx:for="{{weekLabels}}" wx:key="*this" class="wk">{{item}}</view>

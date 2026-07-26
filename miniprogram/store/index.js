@@ -5,6 +5,8 @@
 // - store 只承担两类职责：跨页共享的会话状态（当前选中日期等）与数据变更广播；
 // - 接口保持稳定（get/set/subscribe/emit），后续可平滑替换为 MobX 而不影响页面代码。
 
+const { todayStr } = require('../utils/date');
+
 const listeners = {};
 
 const state = {
@@ -13,12 +15,6 @@ const state = {
   noteVersion: 0,
   planVersion: 0,       // 训练计划（应用/取消/填入）变更计数器
 };
-
-function todayStr() {
-  const d = new Date();
-  const p = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
 
 module.exports = {
   init() {

@@ -19,6 +19,7 @@ withTheme({
     pickedExId: '',
     currentPlan: null,   // { planId, plan } 当前应用的训练计划
     filling: false,
+    formSubmitting: false,
   },
 
   onLoad() {
@@ -38,8 +39,11 @@ withTheme({
   },
 
   async loadRecords(date = this.data.date) {
+    const requestId = (this._recordsRequestId || 0) + 1;
+    this._recordsRequestId = requestId;
     try {
       const records = await recordService.listByDate(date);
+      if (requestId !== this._recordsRequestId) return;
       this.setData({
         date,
         records,
@@ -49,6 +53,7 @@ withTheme({
         isToday: date === todayStr(),
       });
     } catch (e) {
+      if (requestId !== this._recordsRequestId) return;
       showError(e, '训练记录加载失败');
     }
   },
@@ -59,13 +64,17 @@ withTheme({
     if (!this.data.currentPlan) return;
     const dayIndex = Number(e.currentTarget.dataset.index);
     const day = this.data.currentPlan.plan.days[dayIndex];
+    if (!day) return;
+    this.setData({ filling: true });
     wx.showModal({
       title: `填入「${day.name}」`,
       content: `将把该训练日的 ${day.exercises.length} 个动作追加到 ${dateLabel(this.data.date)}，是否继续？`,
       confirmText: '填入',
       success: async res => {
-        if (!res.confirm) return;
-        this.setData({ filling: true });
+        if (!res.confirm) {
+          this.setData({ filling: false });
+          return;
+        }
         try {
           const n = await planService.fillDayToRecords(this.data.currentPlan.planId, dayIndex, this.data.date);
           wx.showToast({ title: `已填入 ${n} 个动作`, icon: 'success' });
@@ -76,6 +85,7 @@ withTheme({
           this.setData({ filling: false });
         }
       },
+      fail: () => this.setData({ filling: false }),
     });
   },
 
@@ -116,6 +126,8 @@ withTheme({
   },
   onFormClose() { this.setData({ formVisible: false }); },
   async onFormConfirm(e) {
+    if (this.data.formSubmitting) return;
+    this.setData({ formSubmitting: true });
     try {
       await recordService.create({ date: this.data.date, ...e.detail });
       this.setData({ formVisible: false });
@@ -123,6 +135,12 @@ withTheme({
       await this.loadRecords(this.data.date);
     } catch (error) {
       showError(error, '保存记录失败');
+    } finally {
+      this.setData({ formSubmitting: false });
     }
+  },
+
+  onUnload() {
+    this._recordsRequestId = (this._recordsRequestId || 0) + 1;
   },
 });

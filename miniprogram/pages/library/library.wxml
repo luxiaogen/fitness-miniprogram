@@ -2,7 +2,8 @@
   <view class="search-wrap">
     <input
       class="search-input"
-      placeholder="搜索动作、肌群或器械"
+      aria-label="搜索动作、目标肌群或器械"
+      placeholder="搜索动作、肌群或器械…"
       value="{{keyword}}"
       bindinput="onSearchInput"
     />

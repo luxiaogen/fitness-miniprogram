@@ -1,7 +1,7 @@
 // pages/stats - 数据统计：本周/本月汇总 + 频次图 + 部位分布
 //
-// 聚合策略（MVP）：拉取周期内记录在前端聚合，数据量小（单用户 < 100 条/月），
-// 避免额外云函数；后续数据增长后可下沉为 stats 云函数（接口已在 ARCHITECTURE.md 定义）。
+// 聚合策略（MVP）：服务层分页拉取周期内记录后在前端聚合，
+// 避免单页上限造成漏算；数据继续增长后可下沉为 stats 云函数。
 const recordService = require('../../services/record');
 const themeService = require('../../services/theme');
 const { withTheme } = require('../../utils/withTheme');
@@ -18,7 +18,7 @@ withTheme({
     totalDuration: 0,
     weekBars: [],      // 近 7 天 [{ label, sets, heightPct }]
     partBars: [],      // 部位分布 [{ label, sets, widthPct }]
-    themePref: 'auto', // 外观设置：light | dark | auto
+    themePref: 'dark', // 外观设置：light | dark | auto
     themeOptions: [
       { k: 'light', icon: '☀️', label: '浅色' },
       { k: 'dark', icon: '🌙', label: '深色' },
@@ -45,6 +45,8 @@ withTheme({
   },
 
   async loadStats() {
+    const requestId = (this._statsRequestId || 0) + 1;
+    this._statsRequestId = requestId;
     try {
       const { start, end } = this.data.period === 'week' ? weekRange() : monthRange();
       const records = await recordService.listRange(start, end);
@@ -63,6 +65,7 @@ withTheme({
 
       const parts = Object.entries(partMap).sort((a, b) => b[1] - a[1]);
       const maxPart = parts.length ? parts[0][1] : 1;
+      if (requestId !== this._statsRequestId) return;
       this.setData({
         days: daySet.size,
         totalSets,
@@ -73,12 +76,15 @@ withTheme({
         })),
       });
     } catch (e) {
+      if (requestId !== this._statsRequestId) return;
       showError(e, '统计数据加载失败');
     }
   },
 
   // 近 7 天柱状图（与周期切换无关，固定展示）
   async loadWeekBars() {
+    const requestId = (this._weekBarsRequestId || 0) + 1;
+    this._weekBarsRequestId = requestId;
     try {
       const start = shiftDate(todayStr(), -6);
       const records = await recordService.listRange(start, todayStr());
@@ -96,9 +102,16 @@ withTheme({
       }
       const max = Math.max(...bars.map(b => b.sets), 1);
       bars.forEach(b => { b.heightPct = Math.max(3, Math.round((b.sets / max) * 100)); });
+      if (requestId !== this._weekBarsRequestId) return;
       this.setData({ weekBars: bars });
     } catch (e) {
+      if (requestId !== this._weekBarsRequestId) return;
       showError(e, '频次数据加载失败');
     }
+  },
+
+  onUnload() {
+    this._statsRequestId = (this._statsRequestId || 0) + 1;
+    this._weekBarsRequestId = (this._weekBarsRequestId || 0) + 1;
   },
 });

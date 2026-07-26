@@ -9,6 +9,6 @@
   </view>
   <view class="ops">
     <text wx:if="{{!compact}}" class="dur">约 {{record.duration}} 分钟</text>
-    <text wx:if="{{deletable}}" class="del" catchtap="onDelete">删除</text>
+    <button wx:if="{{deletable}}" class="del" aria-label="删除这条训练记录" catchtap="onDelete">删除</button>
   </view>
 </view>

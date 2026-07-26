@@ -43,7 +43,18 @@
 .note-text { font-size: 27rpx; line-height: 1.5; color: var(--on-tertiary-container); }
 .note-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12rpx; }
 .time { font-size: 22rpx; color: var(--tertiary); }
-.del { font-size: 24rpx; color: var(--error); padding: 4rpx 12rpx; }
+.del {
+  min-width: 88rpx;
+  min-height: 88rpx;
+  padding: 0 12rpx;
+  margin: -20rpx -12rpx -20rpx 0;
+  border: none;
+  background: transparent;
+  color: var(--error);
+  font-size: 24rpx;
+  line-height: 88rpx;
+}
+.del::after { border: none; }
 .note-empty { font-size: 26rpx; color: var(--on-surface-muted); padding: 8rpx 0 20rpx; }
 
 .note-input { display: flex; gap: 16rpx; margin-top: 16rpx; }

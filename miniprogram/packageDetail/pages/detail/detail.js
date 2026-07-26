@@ -14,6 +14,7 @@ withTheme({
     notes: [],
     noteText: '',
     formVisible: false,
+    formSubmitting: false,
     saving: false,
   },
 
@@ -31,8 +32,11 @@ withTheme({
   },
 
   async loadNotes() {
+    const requestId = (this._notesRequestId || 0) + 1;
+    this._notesRequestId = requestId;
     try {
       const notes = await noteService.listByExercise(this.data.exercise.id);
+      if (requestId !== this._notesRequestId) return;
       // 同步标注状态到全局，动作库列表红点依赖它
       const app = getApp();
       app.globalData.notedMap = app.globalData.notedMap || {};
@@ -41,6 +45,7 @@ withTheme({
         notes: notes.map(n => ({ ...n, timeText: this.formatTime(n.createdAt) })),
       });
     } catch (e) {
+      if (requestId !== this._notesRequestId) return;
       showError(e, '标注加载失败');
     }
   },
@@ -54,6 +59,7 @@ withTheme({
   onNoteInput(e) { this.setData({ noteText: e.detail.value }); },
 
   async onSaveNote() {
+    if (this.data.saving) return;
     const text = this.data.noteText.trim();
     if (!text) return wx.showToast({ title: '请输入标注内容', icon: 'none' });
     this.setData({ saving: true });
@@ -90,6 +96,8 @@ withTheme({
   onAddToday() { this.setData({ formVisible: true }); },
   onFormClose() { this.setData({ formVisible: false }); },
   async onFormConfirm(e) {
+    if (this.data.formSubmitting) return;
+    this.setData({ formSubmitting: true });
     const date = store.todayStr();
     try {
       await recordService.create({ date, ...e.detail });
@@ -98,6 +106,8 @@ withTheme({
       wx.showToast({ title: '已加入今日训练', icon: 'success' });
     } catch (e) {
       showError(e, '加入训练失败');
+    } finally {
+      this.setData({ formSubmitting: false });
     }
   },
 
@@ -107,5 +117,9 @@ withTheme({
       title: `${exercise.nameZh} · 动作要领与演示`,
       path: `/packageDetail/pages/detail/detail?id=${exercise.id}`,
     };
+  },
+
+  onUnload() {
+    this._notesRequestId = (this._notesRequestId || 0) + 1;
   },
 });

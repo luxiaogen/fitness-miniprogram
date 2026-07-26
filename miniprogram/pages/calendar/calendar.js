@@ -21,8 +21,9 @@ withTheme({
   },
 
   onLoad() {
-    const now = new Date();
-    this.setData({ year: now.getFullYear(), month: now.getMonth(), selDate: todayStr() });
+    const today = todayStr();
+    const now = new Date(`${today}T00:00:00`);
+    this.setData({ year: now.getFullYear(), month: now.getMonth(), selDate: today });
   },
 
   onShow() {
@@ -41,6 +42,8 @@ withTheme({
 
   // 拉取当月全部记录 -> 按日期分组 -> 渲染 42 格
   async buildMonth(year = this.data.year, month = this.data.month) {
+    const requestId = (this._monthRequestId || 0) + 1;
+    this._monthRequestId = requestId;
     try {
       const start = dstr(new Date(year, month, 1));
       const end = dstr(new Date(year, month + 1, 0));
@@ -69,15 +72,20 @@ withTheme({
         }
         cells.push({ ds, day, dim, has: !!dayMap[ds], isToday: ds === today, isSel: ds === this.data.selDate });
       }
+      if (requestId !== this._monthRequestId) return;
       this.setData({ cells, monthText: `${year} 年 ${month + 1} 月` });
     } catch (e) {
+      if (requestId !== this._monthRequestId) return;
       showError(e, '日历加载失败');
     }
   },
 
   async loadDayDetail(date = this.data.selDate) {
+    const requestId = (this._detailRequestId || 0) + 1;
+    this._detailRequestId = requestId;
     try {
       const records = await recordService.listByDate(date);
+      if (requestId !== this._detailRequestId) return;
       this.setData({
         selDate: date,
         selRecords: records,
@@ -86,6 +94,7 @@ withTheme({
         selLabel: dateLabel(date),
       });
     } catch (e) {
+      if (requestId !== this._detailRequestId) return;
       showError(e, '训练详情加载失败');
     }
   },
@@ -107,5 +116,10 @@ withTheme({
     store.set('selectedDate', ds);   // 与记录页共享选中日期
     this.buildMonth(this.data.year, this.data.month);
     this.loadDayDetail(ds);
+  },
+
+  onUnload() {
+    this._monthRequestId = (this._monthRequestId || 0) + 1;
+    this._detailRequestId = (this._detailRequestId || 0) + 1;
   },
 });

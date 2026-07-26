@@ -51,9 +51,7 @@ async function fillDayToRecords(planId, dayIndex, date) {
   const plan = getById(planId);
   const day = plan && plan.days[dayIndex];
   if (!day) return 0;
-  // 串行写入，保证云端/本地两种模式下顺序一致；备注合并计划来源与动作要点
-  for (const ex of day.exercises) {
-    await recordService.create({
+  await recordService.createMany(day.exercises.map(ex => ({
       date,
       exId: ex.exId,
       sets: ex.sets,
@@ -61,8 +59,7 @@ async function fillDayToRecords(planId, dayIndex, date) {
       weight: 0,
       duration: ex.sets * 2,
       note: ex.note ? `${day.name} · ${ex.note}` : day.name,
-    });
-  }
+    })));
   return day.exercises.length;
 }
 

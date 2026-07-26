@@ -33,13 +33,19 @@
 }
 .t { font-size: 32rpx; font-weight: 600; color: var(--on-surface); }
 .x {
-  width: 56rpx; height: 56rpx;
+  width: 88rpx; height: 88rpx;
+  min-width: 88rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
   background: var(--surface-container-highest);
   color: var(--on-surface-variant);
   font-size: 26rpx;
+  line-height: 1;
 }
+.x::after { border: none; }
 
 .search { padding: 20rpx 32rpx; flex-shrink: 0; }
 .search-input {

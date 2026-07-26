@@ -3,6 +3,7 @@ const exerciseService = require('../../services/exercise');
 const noteService = require('../../services/note');
 const store = require('../../store/index');
 const { withTheme } = require('../../utils/withTheme');
+const { showError } = require('../../utils/notify');
 
 const FILTER_LABELS = { all: '全部' };
 exerciseService.EXERCISES.forEach(e => { FILTER_LABELS[e.bodyPart] = e.bodyPartZh; });
@@ -30,9 +31,21 @@ withTheme({
   },
 
   async loadNotedMap() {
-    // MVP：标注红点只针对已有数据的动作，本地/云端逐个查询代价高，
-    // 采用轻量方案：进入详情页时记录看过的标注状态，会话内保持
-    this.setData({ notedMap: getApp().globalData.notedMap || {} });
+    const requestId = (this._notedMapRequestId || 0) + 1;
+    this._notedMapRequestId = requestId;
+    try {
+      const exIds = await noteService.listNotedExerciseIds();
+      if (requestId !== this._notedMapRequestId) return;
+      const notedMap = exIds.reduce((map, exId) => {
+        map[exId] = true;
+        return map;
+      }, {});
+      getApp().globalData.notedMap = notedMap;
+      this.setData({ notedMap });
+    } catch (e) {
+      if (requestId !== this._notedMapRequestId) return;
+      showError(e, '标注状态加载失败');
+    }
   },
 
   onFilterTap(e) {
@@ -56,6 +69,10 @@ withTheme({
   },
 
   onShareAppMessage() {
-    return { title: '健身记 · 38 个经典训练动作库', path: '/pages/library/library' };
+    return { title: '健身记 · 51 个经典训练动作库', path: '/pages/library/library' };
+  },
+
+  onUnload() {
+    this._notedMapRequestId = (this._notedMapRequestId || 0) + 1;
   },
 });

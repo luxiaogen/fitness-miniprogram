@@ -2,10 +2,10 @@
 <view class="sheet {{visible ? 'sheet--show' : ''}}" catchtouchmove="noop">
   <view class="sheet-head">
     <text class="t">选择训练动作</text>
-    <view class="x" bindtap="onClose">✕</view>
+    <button class="x" aria-label="关闭动作选择器" bindtap="onClose">✕</button>
   </view>
   <view class="search">
-    <input class="search-input" placeholder="搜索动作" value="{{keyword}}" bindinput="onSearchInput" />
+    <input class="search-input" aria-label="搜索训练动作" placeholder="搜索动作…" value="{{keyword}}" bindinput="onSearchInput" />
   </view>
   <scroll-view scroll-y class="list">
     <ex-item

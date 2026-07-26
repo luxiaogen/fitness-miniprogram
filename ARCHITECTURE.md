@@ -11,9 +11,9 @@
 | 后端 | **微信云开发**（云函数 + 云数据库 + 云存储） | 免域名备案、免 HTTPS 证书、免服务器运维；自带 openid 静默登录；MVP 上线路径最短 |
 | 动作库数据 | **静态打包** `data/exercises.js`（51 动作） | 零网络依赖、列表秒开；数据随版本发布更新，无需建库维护 |
 | 缩略图 | 打进主包（51 张 jpg ≈ 330KB） | 列表页必须秒开；远未触及 2MB 主包上限 |
-| 演示动画 | **32 色压缩 GIF 放入 packageDetail 分包**（51 个 ≈ 1.85MB） | `image` 组件播放 GIF 是最成熟能力，模拟器/真机零差异；单分包 2MB 内可承载；`preloadRule` 预下载，进详情页无感知；后续可平滑切换云存储 CDN |
+| 演示动画 | **32 色压缩 GIF 放入 packageDetail 分包**（51 个 ≈ 1.91MB） | `image` 组件播放 GIF 是最成熟能力；分包余量很小，仅 Wi-Fi 预下载；动作库继续扩充时应迁移云存储 CDN |
 | 状态管理 | 自研 60 行发布/订阅 store | MVP 不引 MobX 等三方依赖；接口稳定，后续可平滑替换 |
-| 数据访问 | 双模 `services/cloud.js`（云端/本地自动降级） | 未配云环境也能在开发者工具完整演示；配好即无缝上云 |
+| 数据访问 | 显式双模 `services/cloud.js`（未配置云环境时本地 / 已配置时云端） | 未配云环境也能完整演示；配置云环境后绝不静默回退本地，避免数据分叉 |
 
 ---
 
@@ -39,7 +39,7 @@
 
 - **主包（约 441KB）**：5 个 tab 页 + 计划详情 + 全部组件/服务/静态数据 + 缩略图，保证启动速度；
 - **packageDetail 分包（约 1.85MB）**：详情页 + 51 个压缩 GIF（150px/32色/lossy，动作库扩充后需在此压缩级别内控制总量）——GIF 是体积大头且只在详情页使用，天然适合分包；
-- **preloadRule**：进入动作库即在后台预下载分包（WiFi/4G 均预载），用户点开详情页时基本无加载感；
+- **preloadRule**：仅在 Wi-Fi 下预下载分包，避免进入动作库时消耗约 1.9MB 蜂窝数据；移动网络下按需加载详情页；
 - 分包页面可引用主包的组件、JS 模块与图片资源（反向不允许），因此 record-form 等无需迁移；
 - **分包余量警示**：分包剩余约 190KB，动作库再扩充时须同比例压低 GIF 压缩参数或迁移云存储。
 
@@ -112,11 +112,12 @@
 
 `services/cloud.js` 是唯一的持久化出口：
 
-- `app.globalData.cloudReady === true` → 路由到云函数；
-- 否则（未配置云环境或静默登录失败）→ 使用 `wx.Storage` 本地模拟，**接口与返回结构完全一致**；
-- 云调用失败时直接向页面报告错误，不再静默切换本地存储，避免同一用户产生两份互不一致的数据。
+- 未配置 `CLOUD_ENV` → 使用 `wx.Storage` 本地模拟；
+- 配置 `CLOUD_ENV` 后 → 只路由到云函数；初始化、登录或请求失败都会明确报错，绝不改写到本地存储；
+- 静默登录仅维护 `users` 集合，不决定数据存储模式，避免临时登录失败产生两份互不一致的数据；
+- `records.list` 与 `notes.list` 使用 `{ items, hasMore }` 分页响应，服务层自动拉取完整数据，页面不受单页上限影响。
 
-收益：开发/演示/评审场景无需后端即可跑通全流程；上线只需配置 `env.js` 中的 `CLOUD_ENV`。
+收益：开发/演示/评审场景无需后端即可跑通全流程；上线只需配置 `env.js` 中的 `CLOUD_ENV`，并能保持本地与云端模式的行为边界清晰。
 
 ---
 
@@ -141,8 +142,9 @@
 
 | action | 入参 | 返回 |
 |---|---|---|
-| `list` | `{ date }` 或 `{ start, end }` | `Record[]`（按 createdAt 升序，≤200 条） |
+| `list` | `{ date }` 或 `{ start, end }`，可选 `{ offset, pageSize }` | `{ items: Record[], hasMore: boolean }`（按 createdAt 升序） |
 | `create` | `{ record }` | 新建后的 `Record` |
+| `createMany` | `{ records: RecordInput[] }`（≤20 条） | 原子写入后的 `Record[]` |
 | `remove` | `{ id }` | `{ removed: number }` |
 
 ```ts
@@ -150,10 +152,10 @@ interface Record {
   _id: string;
   date: string;      // YYYY-MM-DD
   exId: string;      // 动作库静态数据 id
-  sets: number;      // ≥1
-  reps: number;      // ≥1
-  weight: number;    // kg，0 = 自重
-  duration: number;  // 分钟，≥1
+  sets: number;      // 1-100
+  reps: number;      // 1-1000
+  weight: number;    // kg，0-10000，0 = 自重
+  duration: number;  // 分钟，1-1440
   note: string;      // ≤200 字
   createdAt: Date;
 }
@@ -163,13 +165,14 @@ interface Record {
 
 | action | 入参 | 返回 |
 |---|---|---|
-| `list` | `{ exId }` | `Note[]`（时间倒序，≤50 条） |
+| `list` | `{ exId }`，可选 `{ offset, pageSize }` | `{ items: Note[], hasMore: boolean }`（时间倒序） |
+| `summary` | 可选 `{ offset, pageSize }` | `{ items: exId[], hasMore: boolean }` |
 | `create` | `{ exId, text }` | 新建后的 `Note`（text ≤120 字） |
 | `remove` | `{ id }` | `{ removed: number }` |
 
 ### stats（预留，v1.1）
 
-当前由前端聚合（单用户月数据 < 100 条，拉取成本可忽略）。接口预定义：
+当前由前端聚合；服务层会分页拉取完整周期数据，避免单页查询上限造成静默漏算。训练日期统一按中国标准时间定义。接口预定义：
 
 - `GET stats { period: 'week'|'month' }` → `{ days, totalSets, totalReps, totalDuration, partDistribution: [{label, sets}] }`
 
@@ -184,18 +187,18 @@ interface Record {
 ```
 cloudfunctions/
 ├── login/    静默登录，维护 users 集合
-├── records/  训练记录 list / create / remove
-└── notes/    动作标注 list / create / remove
+├── records/  训练记录 list / create / createMany / remove
+└── notes/    动作标注 list / summary / create / remove
 
 云数据库集合（权限：仅创建者可读写）
 ├── users     { _openid, createdAt, lastActiveAt }
 ├── records   { _openid, date, exId, sets, reps, weight, duration, note, createdAt }
-│             索引建议：(_openid, date) 联合索引
+│             索引建议：(_openid, date, createdAt) 联合索引
 └── notes     { _openid, exId, text, createdAt }
-              索引建议：(_openid, exId) 联合索引
+              索引建议：(_openid, exId, createdAt) 与 (_openid, createdAt) 联合索引
 ```
 
-> 演示动画（压缩 GIF）位于 `packageDetail` 分包内，无需云存储；`tools/gifs/` 保留原始素材，`tools/convert_gifs.sh` 为压缩脚本。
+> 演示动画（压缩 GIF）位于 `packageDetail` 分包内，无需云存储；`tools/gifs/` 保留原始素材，`tools/convert_gifs.sh` 为压缩脚本。详情分包目前接近 2 MB，因此仅在 Wi-Fi 下预下载；新增动作前必须复核分包体积，必要时迁移 GIF 到云存储。
 
 ### 支撑快速迭代的设计
 
@@ -208,9 +211,10 @@ cloudfunctions/
 
 1. 注册小程序 AppID，替换 `project.config.json` 的 `appid`；
 2. 开通云开发，把环境 ID 填入 `miniprogram/env.js` 的 `CLOUD_ENV`；
-3. 创建 `users / records / notes` 三个集合，权限设为「仅创建者可读写」；
+3. 创建 `users / records / notes` 三个集合，权限设为「仅创建者可读写」，并创建上述联合索引；
 4. 右键分别部署 `login / records / notes` 三个云函数；
-5. 开发者工具「上传」→ 提交审核（类目建议：体育 > 健身；隐私协议勾选「无收集」——openid 不属敏感信息）。
+5. 在真机验证：本地模式、云端模式、弱网错误、跨午夜日期、批量填入和主题切换；
+6. 根据实际运营主体、联系方式、数据用途、留存期限与用户权利编制隐私政策和审核材料；不要把“无收集”作为默认声明。
 
 ---
 

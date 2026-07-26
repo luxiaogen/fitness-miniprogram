@@ -5,7 +5,12 @@ const { normalizeNote, assertId } = require('../utils/validation');
 
 // 某动作的全部标注（按时间倒序）
 async function listByExercise(exId) {
-  return cloud.request('notes', { action: 'list', exId: assertId(exId, '动作') });
+  return cloud.listAll('notes', { action: 'list', exId: assertId(exId, '动作') });
+}
+
+async function listNotedExerciseIds() {
+  const exIds = await cloud.listAll('notes', { action: 'summary' });
+  return [...new Set(exIds)];
 }
 
 // 新增标注
@@ -21,4 +26,4 @@ async function remove(id) {
   return res;
 }
 
-module.exports = { listByExercise, create, remove };
+module.exports = { listByExercise, listNotedExerciseIds, create, remove };
