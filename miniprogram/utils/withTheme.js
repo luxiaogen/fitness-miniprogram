@@ -23,6 +23,8 @@ function withTheme(options) {
     onShow() {
       // 从设置页返回或系统主题变化后兜底同步
       const t = themeService.effective();
+      // 页面切换会恢复 app.json 的默认导航栏配置，需为当前页重新应用主题。
+      themeService.applyPageChrome(t);
       if (this.data.theme !== t) this.setData({ theme: t });
       userOnShow && userOnShow.call(this);
     },
