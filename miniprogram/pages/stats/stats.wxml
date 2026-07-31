@@ -5,49 +5,54 @@
     <button class="seg-item {{period === 'month' ? 'seg-item--active' : ''}}" aria-label="查看本月统计" data-p="month" bindtap="onPeriodTap">本月</button>
   </view>
 
-  <!-- 指标卡片 -->
-  <view class="stat-grid">
-    <view class="stat-card">
-      <view class="v">{{days}}<text class="u">天</text></view>
-      <view class="k">锻炼天数</view>
-    </view>
-    <view class="stat-card">
-      <view class="v">{{totalSets}}<text class="u">组</text></view>
-      <view class="k">累计组数</view>
-    </view>
-    <view class="stat-card">
-      <view class="v">{{totalReps}}<text class="u">次</text></view>
-      <view class="k">累计次数</view>
-    </view>
-    <view class="stat-card">
-      <view class="v">{{totalDuration}}<text class="u">分钟</text></view>
-      <view class="k">总时长</view>
-    </view>
-  </view>
-
-  <!-- 近 7 天频次 -->
-  <view class="sec-title">近 7 天锻炼频次 <text class="sec-sub">（组数）</text></view>
-  <view class="card">
-    <view class="week-chart">
-      <view wx:for="{{weekBars}}" wx:key="label" class="col">
-        <view class="bar" style="height: {{item.heightPct}}%">
-          <text wx:if="{{item.sets}}" class="bar-val">{{item.sets}}</text>
+  <!-- 指标与图表（加载态 / 失败重试） -->
+  <load-state loading="{{loading}}" error="{{loadError}}" retryText="重新加载" bindretry="onRetry">
+    <block>
+      <!-- 指标卡片 -->
+      <view class="stat-grid">
+        <view class="stat-card">
+          <view class="v">{{days}}<text class="u">天</text></view>
+          <view class="k">锻炼天数</view>
         </view>
-        <view class="d">{{item.label}}</view>
+        <view class="stat-card">
+          <view class="v">{{totalSets}}<text class="u">组</text></view>
+          <view class="k">累计组数</view>
+        </view>
+        <view class="stat-card">
+          <view class="v">{{totalReps}}<text class="u">次</text></view>
+          <view class="k">累计次数</view>
+        </view>
+        <view class="stat-card">
+          <view class="v">{{totalDuration}}<text class="u">分钟</text></view>
+          <view class="k">总时长</view>
+        </view>
       </view>
-    </view>
-  </view>
 
-  <!-- 部位分布 -->
-  <view class="sec-title">{{period === 'week' ? '本周' : '本月'}}部位训练分布 <text class="sec-sub">（组数）</text></view>
-  <view class="card">
-    <view wx:for="{{partBars}}" wx:key="label" class="bar-row">
-      <text class="lbl">{{item.label}}</text>
-      <view class="track"><view class="fill" style="width: {{item.widthPct}}%" /></view>
-      <text class="val">{{item.sets}} 组</text>
-    </view>
-    <empty wx:if="{{!partBars.length}}" icon="📊" text="该周期内暂无训练数据" />
-  </view>
+      <!-- 近 7 天频次 -->
+      <view class="sec-title">近 7 天锻炼频次 <text class="sec-sub">（组数）</text></view>
+      <view class="card">
+        <view class="week-chart">
+          <view wx:for="{{weekBars}}" wx:key="label" class="col">
+            <view class="bar" style="height: {{item.heightPct}}%">
+              <text wx:if="{{item.sets}}" class="bar-val">{{item.sets}}</text>
+            </view>
+            <view class="d">{{item.label}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 部位分布 -->
+      <view class="sec-title">{{period === 'week' ? '本周' : '本月'}}部位训练分布 <text class="sec-sub">（组数）</text></view>
+      <view class="card">
+        <view wx:for="{{partBars}}" wx:key="label" class="bar-row">
+          <text class="lbl">{{item.label}}</text>
+          <view class="track"><view class="fill" style="width: {{item.widthPct}}%" /></view>
+          <text class="val">{{item.sets}} 组</text>
+        </view>
+        <empty wx:if="{{!partBars.length}}" icon="📊" text="该周期内暂无训练数据" />
+      </view>
+    </block>
+  </load-state>
 
   <!-- 外观设置 -->
   <view class="sec-title">外观</view>

@@ -38,10 +38,21 @@ async function createMany(records) {
   return items;
 }
 
+// 更新一条训练记录（保留原 createdAt / _openid）
+async function update(id, record) {
+  const item = await cloud.request('records', {
+    action: 'update',
+    id: assertId(id),
+    record: normalizeRecord(record),
+  });
+  store.bumpRecords();
+  return item;
+}
+
 async function remove(id) {
   const res = await cloud.request('records', { action: 'remove', id: assertId(id) });
   store.bumpRecords();
   return res;
 }
 
-module.exports = { listByDate, listRange, create, createMany, remove };
+module.exports = { listByDate, listRange, create, createMany, update, remove };

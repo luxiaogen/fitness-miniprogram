@@ -4,6 +4,7 @@
     "log-item": "/components/log-item/index",
     "ex-picker": "/components/ex-picker/index",
     "record-form": "/components/record-form/index",
-    "empty": "/components/empty/index"
+    "empty": "/components/empty/index",
+    "load-state": "/components/load-state/index"
   }
 }

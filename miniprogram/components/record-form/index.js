@@ -11,6 +11,7 @@ Component({
     visible: { type: Boolean, value: false },
     exId: { type: String, value: '' },
     submitting: { type: Boolean, value: false },
+    initial: { type: Object, value: null },   // 编辑模式：预填的记录（含 _id）
   },
   data: {
     exercise: null,
@@ -21,11 +22,16 @@ Component({
     note: '',
   },
   observers: {
-    'visible, exId': function (visible, exId) {
+    'visible, exId, initial': function (visible, exId, initial) {
       if (visible && exId) {
         this.setData({
           exercise: getById(exId),
-          sets: 4, reps: 12, weight: 0, duration: 8, note: '',
+          // 防御性预填：旧数据可能缺字段，缺失时回落默认值（合法数据中 sets/reps/duration 最小为 1，weight 可为 0）
+          sets: initial ? (initial.sets || 4) : 4,
+          reps: initial ? (initial.reps || 12) : 12,
+          weight: initial ? (initial.weight || 0) : 0,
+          duration: initial ? (initial.duration || 8) : 8,
+          note: initial ? (initial.note || '') : '',
         });
       }
     },
@@ -54,8 +60,10 @@ Component({
     onConfirm() {
       if (this.data.submitting) return;
       const { exId, sets, reps, weight, duration, note } = this.data;
+      const initial = this.data.initial;
       this.triggerEvent('confirm', {
         exId, sets, reps, weight, duration: duration || sets * 2, note: note.trim(),
+        ...(initial ? { id: initial._id } : {}),
       });
     },
     noop() {},

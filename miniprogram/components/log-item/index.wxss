@@ -46,6 +46,19 @@
   flex-shrink: 0;
 }
 .dur { font-size: 22rpx; color: var(--on-surface-muted); }
+.op-btns { display: flex; align-items: center; }
+.edit {
+  min-width: 88rpx;
+  min-height: 88rpx;
+  padding: 0 12rpx;
+  margin: -16rpx -4rpx -16rpx 0;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 26rpx;
+  line-height: 88rpx;
+}
+.edit::after { border: none; }
 .del {
   min-width: 88rpx;
   min-height: 88rpx;

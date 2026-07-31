@@ -92,6 +92,16 @@ const localImpl = {
       writeLocal(LOCAL_KEYS.records, all.concat(items));
       return items;
     },
+    async update({ id, record }) {
+      const all = readLocal(LOCAL_KEYS.records);
+      const index = all.findIndex(r => r._id === id);
+      if (index === -1) throw new Error('记录不存在');
+      const prev = all[index];
+      const item = { ...prev, ...record, _id: prev._id, createdAt: prev.createdAt };
+      all[index] = item;
+      writeLocal(LOCAL_KEYS.records, all);
+      return item;
+    },
     async remove({ id }) {
       const all = readLocal(LOCAL_KEYS.records);
       const remaining = all.filter(r => r._id !== id);

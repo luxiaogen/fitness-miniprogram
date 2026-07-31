@@ -79,6 +79,94 @@ test('invalid local batches do not leave partially written records', async () =>
   assert.equal((storage.get('local_records') || []).length, 0);
 });
 
+test('local records support editing while preserving identity and createdAt', async () => {
+  const { storage } = setupMiniProgram();
+  const { todayStr } = require('../miniprogram/utils/date');
+  const recordService = require('../miniprogram/services/record');
+  const date = todayStr();
+
+  const created = await recordService.create(makeRecord(date, 0));
+  const updated = await recordService.update(created._id, {
+    ...makeRecord(date, 1),
+    sets: 8,
+    note: 'edited',
+  });
+
+  assert.equal(updated._id, created._id);
+  assert.equal(updated.createdAt, created.createdAt);
+  assert.equal(updated.sets, 8);
+  assert.equal(updated.note, 'edited');
+  const records = await recordService.listByDate(date);
+  assert.equal(records.length, 1);
+  assert.equal(records[0].sets, 8);
+});
+
+test('local record update rejects unknown ids without touching storage', async () => {
+  const { storage } = setupMiniProgram();
+  const { todayStr } = require('../miniprogram/utils/date');
+  const recordService = require('../miniprogram/services/record');
+
+  await assert.rejects(
+    recordService.update('missing-id', makeRecord(todayStr(), 0)),
+    /记录不存在/,
+  );
+  assert.equal((storage.get('local_records') || []).length, 0);
+});
+
+test('local mode plan apply/cancel/current round-trips through storage', async () => {
+  const { storage } = setupMiniProgram();
+  const planService = require('../miniprogram/services/plan');
+
+  assert.equal(await planService.current(), null);
+
+  await planService.apply('ppl-linear');
+  const cur = await planService.current();
+  assert.equal(cur.planId, 'ppl-linear');
+  assert.equal(typeof cur.appliedAt, 'number');
+  assert.equal(storage.get('et_current_plan').planId, 'ppl-linear');
+
+  const currentPlan = await planService.currentPlan();
+  assert.equal(currentPlan.plan.id, 'ppl-linear');
+  assert.equal(currentPlan.plan.days.length, 3);
+
+  await planService.cancel();
+  assert.equal(await planService.current(), null);
+  assert.equal(storage.get('et_current_plan'), undefined);
+});
+
+test('cloud mode plan apply/cancel/current routes to the user cloud function', async () => {
+  let plan = null;
+  setupMiniProgram({
+    cloudConfigured: true,
+    cloudReady: true,
+    callFunction: async ({ name, data }) => {
+      assert.equal(name, 'user');
+      if (data.action === 'getPlan') return { result: { code: 0, data: { plan } } };
+      if (data.action === 'setPlan') { plan = data.plan; return { result: { code: 0, data: { plan } } }; }
+      throw new Error(`unexpected action: ${data.action}`);
+    },
+  });
+  const planService = require('../miniprogram/services/plan');
+
+  assert.equal(await planService.current(), null);
+  await planService.apply('ppl-linear');
+  assert.equal((await planService.current()).planId, 'ppl-linear');
+  await planService.cancel();
+  assert.equal(await planService.current(), null);
+});
+
+test('cloud mode plan failures surface errors without writing local storage', async () => {
+  const { storage } = setupMiniProgram({
+    cloudConfigured: true,
+    cloudReady: true,
+    callFunction: async () => { throw new Error('network down'); },
+  });
+  const planService = require('../miniprogram/services/plan');
+
+  await assert.rejects(planService.apply('ppl-linear'), /云端服务暂不可用/);
+  assert.equal(storage.get('et_current_plan'), undefined);
+});
+
 test('plan fill performs one atomic local write for the complete training day', async () => {
   const { storage, writes } = setupMiniProgram();
   const { todayStr } = require('../miniprogram/utils/date');

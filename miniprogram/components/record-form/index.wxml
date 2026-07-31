@@ -57,7 +57,7 @@
     </scroll-view>
 
     <view class="foot">
-      <button class="btn-primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onConfirm">确定添加</button>
+      <button class="btn-primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onConfirm">{{initial ? '确定更新' : '确定添加'}}</button>
     </view>
   </view>
 </block>

@@ -26,7 +26,7 @@
 | 模块 | 能做什么 |
 | --- | --- |
 | 动作库 | 浏览 51 个动作，按部位筛选，搜索肌群/器械，查看步骤与 GIF 演示 |
-| 训练计划 | 浏览 4 个计划模板，查看完整课表，一键应用为我的方案 |
+| 训练计划 | 浏览 4 个计划模板，查看完整课表，一键应用为我的方案（云端模式跨设备同步） |
 | 每日记录 | 按日期添加动作、组数、次数、重量、时长和备注 |
 | 日历 | 查看月度训练标记和某天的训练详情 |
 | 统计 | 查看本周/本月训练天数、组数、次数、时长和部位分布 |
@@ -55,7 +55,7 @@ CLOUD_ENV: ''
 2. 把环境 ID 写入 `miniprogram/env.js` 的 `CLOUD_ENV`。
 3. 创建 `users`、`records`、`notes` 三个云数据库集合，权限设为“仅创建者可读写”。
 4. 创建联合索引：`records` 使用 `(_openid, date, createdAt)`；`notes` 使用 `(_openid, exId, createdAt)` 和 `(_openid, createdAt)`。
-5. 分别部署 `cloudfunctions/login`、`cloudfunctions/records`、`cloudfunctions/notes`。
+5. 分别部署 `cloudfunctions/login`、`cloudfunctions/records`、`cloudfunctions/notes`、`cloudfunctions/user`。
 
 云端请求或静默登录失败时，应用会明确提示错误，不会把写入操作偷偷切换到本地，避免产生两份不一致的数据。训练日期统一按中国标准时间处理。
 
@@ -83,7 +83,7 @@ CLOUD_ENV: ''
 - **数据边界清晰**：页面状态、全局会话状态和持久化数据分层管理。
 - **小程序原生能力**：使用分包、预下载、云函数和云数据库。
 - **服务层复用**：页面不直接依赖云函数协议，记录与标注通过统一 service 访问。
-- **输入安全**：客户端和云函数双重校验日期、数值、文本长度和用户数据归属。
+- **输入安全**：客户端和云函数双重校验日期、数值、文本长度和用户数据归属；数值限制由 `shared/validation.js` 单一事实源生成，两端不会漂移。
 - **完整聚合**：记录与标注会分页读取；统计不会因单页上限而静默漏算。
 - **原子填入**：训练计划在本地模式一次写入，在云端模式使用事务写入，避免半套计划残留。
 
@@ -127,7 +127,7 @@ It runs in a local-storage demo mode by default, so the project can be explored 
 | Module | What it provides |
 | --- | --- |
 | Exercise library | 51 exercises, body-part filters, keyword search, step-by-step guidance, and GIF demos |
-| Training plans | 4 plan templates, full routines, and one-tap application |
+| Training plans | 4 plan templates, full routines, and one-tap application (synced across devices in cloud mode) |
 | Daily logging | Date, sets, reps, weight, duration, and notes |
 | Calendar | Monthly workout markers and day-level details |
 | Statistics | Weekly/monthly days, sets, reps, duration, and body-part distribution |
@@ -156,7 +156,7 @@ To persist data across devices:
 2. Set the environment ID as `CLOUD_ENV` in `miniprogram/env.js`.
 3. Create `users`, `records`, and `notes` collections with creator-only read/write permissions.
 4. Create composite indexes: `(_openid, date, createdAt)` for `records`; `(_openid, exId, createdAt)` and `(_openid, createdAt)` for `notes`.
-5. Deploy `cloudfunctions/login`, `cloudfunctions/records`, and `cloudfunctions/notes`.
+5. Deploy `cloudfunctions/login`, `cloudfunctions/records`, `cloudfunctions/notes`, and `cloudfunctions/user`.
 
 Cloud request and silent-login failures are surfaced to the user instead of silently switching a write to local storage. This prevents two divergent copies of the same data. Training dates use China Standard Time consistently.
 
@@ -171,7 +171,7 @@ Cloud request and silent-login failures are surfaced to the user instead of sile
 │   ├── services/              # Cloud access, records, notes, plans, and themes
 │   ├── data/                  # 51 exercises and 4 training plans
 │   └── utils/                 # Dates, theme wrapper, validation, and notifications
-├── cloudfunctions/            # login / records / notes
+├── cloudfunctions/            # login / records / notes / user
 ├── project.private.config.example.json # Local AppID template
 ├── assets/readme/             # README visual assets
 ├── ARCHITECTURE.md            # Architecture and cloud API notes
@@ -184,7 +184,7 @@ Cloud request and silent-login failures are surfaced to the user instead of sile
 - **Clear data boundaries**: page state, shared session state, and persisted data are separated.
 - **Native Mini Program capabilities**: subpackages, preloading, cloud functions, and cloud database.
 - **Reusable service layer**: pages consume stable services instead of calling cloud functions directly.
-- **Input safety**: dates, numeric fields, text length, and user ownership are validated on both client and server.
+- **Input safety**: dates, numeric fields, text length, and user ownership are validated on both client and server; numeric limits come from a single `shared/validation.js` source of truth so the two sides cannot drift.
 - **Complete aggregation**: records and notes are paginated so statistics do not silently omit data after a single-page limit.
 - **Atomic plan fills**: plan days are written once in local mode and transactionally in cloud mode, preventing partial routines.
 

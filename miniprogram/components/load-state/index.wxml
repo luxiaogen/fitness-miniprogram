@@ -1,0 +1,11 @@
+<view wx:if="{{loading}}" class="ls ls--loading" aria-label="加载中">
+  <view class="ls-skeleton" />
+  <view class="ls-skeleton" />
+  <view class="ls-skeleton" />
+</view>
+<view wx:elif="{{error}}" class="ls ls--error">
+  <view class="ls-icon">⚠️</view>
+  <view class="ls-text">加载失败，请检查网络后重试</view>
+  <button class="ls-retry" bindtap="onRetry">{{retryText}}</button>
+</view>
+<slot wx:else />

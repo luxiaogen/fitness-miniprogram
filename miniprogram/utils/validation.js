@@ -1,46 +1,22 @@
 // Shared client-side validation and normalization for persisted data.
+// 数值限制（RECORD_LIMITS / normalizeNumber）来自 shared/validation.js，
+// 与云函数共用同一事实源（生成副本 validation-shared.js，勿手改）。
 const { todayStr } = require('./date');
+const { RECORD_LIMITS, normalizeNumber } = require('./validation-shared');
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const RECORD_LIMITS = Object.freeze({
-  sets: { min: 1, max: 100, label: '组数' },
-  reps: { min: 1, max: 1000, label: '每组次数' },
-  weight: { min: 0, max: 10000, label: '重量' },
-  duration: { min: 1, max: 1440, label: '时长' },
-});
 
 function isValidDate(value) {
   if (typeof value !== 'string' || !DATE_RE.test(value)) return false;
-  const date = new Date(`${value}T00:00:00`);
+  // UTC 解析 + UTC getters：日期合法性判断与设备时区无关
+  const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) &&
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` === value;
+    `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}` === value;
 }
 
 function assertDate(value, label = '日期') {
   if (!isValidDate(value)) throw new Error(`${label}格式无效`);
   return value;
-}
-
-function finiteNumber(value, label) {
-  const number = Number(value);
-  if (!Number.isFinite(number)) throw new Error(`${label}必须是有效数字`);
-  return number;
-}
-
-function normalizeInteger(value, limits) {
-  const number = finiteNumber(value, limits.label);
-  if (!Number.isInteger(number) || number < limits.min || number > limits.max) {
-    throw new Error(`${limits.label}应为 ${limits.min}-${limits.max} 的整数`);
-  }
-  return number;
-}
-
-function normalizeDecimal(value, limits) {
-  const number = finiteNumber(value, limits.label);
-  if (number < limits.min || number > limits.max) {
-    throw new Error(`${limits.label}应为 ${limits.min}-${limits.max}`);
-  }
-  return number;
 }
 
 function normalizeRecord(record = {}) {
@@ -50,10 +26,10 @@ function normalizeRecord(record = {}) {
   if (!exId) throw new Error('请选择训练动作');
   if (exId.length > 64) throw new Error('动作标识无效');
 
-  const sets = normalizeInteger(record.sets, RECORD_LIMITS.sets);
-  const reps = normalizeInteger(record.reps, RECORD_LIMITS.reps);
-  const weight = normalizeDecimal(record.weight, RECORD_LIMITS.weight);
-  const duration = normalizeInteger(record.duration, RECORD_LIMITS.duration);
+  const sets = normalizeNumber(record.sets, RECORD_LIMITS.sets);
+  const reps = normalizeNumber(record.reps, RECORD_LIMITS.reps);
+  const weight = normalizeNumber(record.weight, RECORD_LIMITS.weight);
+  const duration = normalizeNumber(record.duration, RECORD_LIMITS.duration);
   const note = String(record.note || '').trim().slice(0, 200);
 
   return { date, exId, sets, reps, weight, duration, note };

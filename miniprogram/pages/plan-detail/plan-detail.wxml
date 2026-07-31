@@ -54,7 +54,7 @@
 
   <!-- 应用按钮 -->
   <view class="cta">
-    <button class="btn-primary {{applied ? 'btn-applied' : ''}}" bindtap="onToggleApply">
+    <button class="btn-primary {{applied ? 'btn-applied' : ''}}" loading="{{applying}}" disabled="{{applying}}" bindtap="onToggleApply">
       {{applied ? '✓ 已应用 · 点击取消' : '应用为我的训练方案'}}
     </button>
     <view class="cta-tip" wx:if="{{applied}}">应用后可在「记录」页将课表一键填入当日训练</view>

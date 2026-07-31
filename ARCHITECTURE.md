@@ -14,6 +14,7 @@
 | 演示动画 | **32 色压缩 GIF 放入 packageDetail 分包**（51 个 ≈ 1.91MB） | `image` 组件播放 GIF 是最成熟能力；分包余量很小，仅 Wi-Fi 预下载；动作库继续扩充时应迁移云存储 CDN |
 | 状态管理 | 自研 60 行发布/订阅 store | MVP 不引 MobX 等三方依赖；接口稳定，后续可平滑替换 |
 | 数据访问 | 显式双模 `services/cloud.js`（未配置云环境时本地 / 已配置时云端） | 未配云环境也能完整演示；配置云环境后绝不静默回退本地，避免数据分叉 |
+| 校验限制 | `shared/validation.js` 单一事实源 + 生成副本（`scripts/sync-shared.js`） | 客户端与云函数共用同一份 `RECORD_LIMITS`/`normalizeNumber`，防止两端限制漂移；`npm run verify` 断言副本一致 |
 
 ---
 
@@ -46,7 +47,7 @@
 ### 训练计划模块
 
 - **数据**：`data/plans.js` 静态打包 4 个热门计划（三分化线性渐进 / 新手全身 / 上下肢二分化 / 五分化健美），课表动作通过 `exId` 引用动作库，保证演示图与详情可达；
-- **应用计划**：`services/plan.js` 将 `{planId, appliedAt}` 存本地（接入云后可迁移 users 集合），`store.planVersion` 广播变更；
+- **应用计划**：`services/plan.js` 双模存储——本地模式存 `wx.Storage`；云端模式经 `user` 云函数读写 `users.appliedPlan`，跨设备同步，云端失败明确报错、绝不静默回退本地（与记录/标注同一数据边界原则），`store.planVersion` 广播变更；
 - **一键填入**：log 页顶部计划横幅展示当前计划的各训练日，点击将该日全部动作批量写入当前日期记录（本地一次写入、云端事务写入，备注合并"训练日 · 动作要点"）。
 
 导航逻辑：
@@ -82,7 +83,7 @@
 ### 后续扩展预留
 
 - 动作收藏、训练模板等新列表场景可直接复用 `ex-item`；
-- 新增「编辑记录」时 `record-form` 增加 `initial` 属性即可，不破坏现有调用方。
+- 「编辑记录」已落地：`record-form` 传入 `initial`（含 `_id` 的记录）即进入编辑模式并预填表单，提交时 log 页走 `recordService.update`，不破坏新增模式的现有调用方。
 
 ---
 
@@ -145,6 +146,7 @@
 | `list` | `{ date }` 或 `{ start, end }`，可选 `{ offset, pageSize }` | `{ items: Record[], hasMore: boolean }`（按 createdAt 升序） |
 | `create` | `{ record }` | 新建后的 `Record` |
 | `createMany` | `{ records: RecordInput[] }`（≤20 条） | 原子写入后的 `Record[]` |
+| `update` | `{ id, record }` | 更新后的 `Record`（`_openid` / `createdAt` 不可变，仅更新业务字段） |
 | `remove` | `{ id }` | `{ removed: number }` |
 
 ```ts
@@ -170,6 +172,13 @@ interface Record {
 | `create` | `{ exId, text }` | 新建后的 `Note`（text ≤120 字） |
 | `remove` | `{ id }` | `{ removed: number }` |
 
+### user（用户资料）
+
+| action | 入参 | 返回 |
+|---|---|---|
+| `getPlan` | 无 | `{ plan: { planId, appliedAt } \| null }` |
+| `setPlan` | `{ plan }`，`plan` 为 `null` 时清除 | `{ plan }`（同入参） |
+
 ### stats（预留，v1.1）
 
 当前由前端聚合；服务层会分页拉取完整周期数据，避免单页查询上限造成静默漏算。训练日期统一按中国标准时间定义。接口预定义：
@@ -187,11 +196,12 @@ interface Record {
 ```
 cloudfunctions/
 ├── login/    静默登录，维护 users 集合
-├── records/  训练记录 list / create / createMany / remove
-└── notes/    动作标注 list / summary / create / remove
+├── records/  训练记录 list / create / createMany / update / remove
+├── notes/    动作标注 list / summary / create / remove
+└── user/     用户资料：当前训练计划 getPlan / setPlan（users.appliedPlan）
 
 云数据库集合（权限：仅创建者可读写）
-├── users     { _openid, createdAt, lastActiveAt }
+├── users     { _openid, createdAt, lastActiveAt, appliedPlan? }
 ├── records   { _openid, date, exId, sets, reps, weight, duration, note, createdAt }
 │             索引建议：(_openid, date, createdAt) 联合索引
 └── notes     { _openid, exId, text, createdAt }
@@ -212,7 +222,7 @@ cloudfunctions/
 1. 注册小程序 AppID，复制 `project.private.config.example.json` 为 Git 忽略的 `project.private.config.json`，并只在该本地文件填写 `appid`；
 2. 开通云开发，把环境 ID 填入 `miniprogram/env.js` 的 `CLOUD_ENV`；
 3. 创建 `users / records / notes` 三个集合，权限设为「仅创建者可读写」，并创建上述联合索引；
-4. 右键分别部署 `login / records / notes` 三个云函数；
+4. 右键分别部署 `login / records / notes / user` 四个云函数；
 5. 在真机验证：本地模式、云端模式、弱网错误、跨午夜日期、批量填入和主题切换；
 6. 根据实际运营主体、联系方式、数据用途、留存期限与用户权利编制隐私政策和审核材料；不要把“无收集”作为默认声明。
 
@@ -243,6 +253,8 @@ exercise-tracker-miniprogram/
 │   ├── utils/date.js            # 日期工具
 │   ├── components/              # empty / ex-item / log-item / ex-picker / record-form
 │   └── pages/                   # library / plans / log / calendar / stats / plan-detail
-├── cloudfunctions/              # login / records / notes
+├── cloudfunctions/              # login / records / notes / user
+├── shared/validation.js         # 记录字段限制唯一事实源（sync 生成两端副本）
+├── scripts/sync-shared.js       # shared -> miniprogram / cloudfunctions 副本同步
 └── tools/gifs/                  # 51 个原始 GIF 素材（压缩后进 packageDetail 分包，目录仅备查）
 ```

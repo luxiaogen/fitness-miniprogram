@@ -1,37 +1,41 @@
 <view class="page theme-{{theme}}">
-  <view class="card cal-card">
-    <view class="cal-head">
-      <button class="arrow" aria-label="查看上个月" data-d="-1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--left" /></button>
-      <view class="month">{{monthText}}</view>
-      <button class="arrow" aria-label="查看下个月" data-d="1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--right" /></button>
-    </view>
-    <view class="grid">
-      <view wx:for="{{weekLabels}}" wx:key="*this" class="wk">{{item}}</view>
-      <view
-        wx:for="{{cells}}"
-        wx:key="ds"
-        class="cell {{item.dim ? 'cell--dim' : ''}} {{item.isToday ? 'cell--today' : ''}} {{item.isSel ? 'cell--sel' : ''}}"
-        data-ds="{{item.ds}}"
-        data-dim="{{item.dim}}"
-        bindtap="onSelectDay"
-      >
-        {{item.day}}
-        <view wx:if="{{item.has}}" class="dot" />
+  <load-state loading="{{loading}}" error="{{loadError}}" retryText="重新加载" bindretry="onRetry">
+    <block>
+      <view class="card cal-card">
+        <view class="cal-head">
+          <button class="arrow" aria-label="查看上个月" data-d="-1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--left" /></button>
+          <view class="month">{{monthText}}</view>
+          <button class="arrow" aria-label="查看下个月" data-d="1" bindtap="onShiftMonth"><view class="arrow-icon arrow-icon--right" /></button>
+        </view>
+        <view class="grid">
+          <view wx:for="{{weekLabels}}" wx:key="*this" class="wk">{{item}}</view>
+          <view
+            wx:for="{{cells}}"
+            wx:key="ds"
+            class="cell {{item.dim ? 'cell--dim' : ''}} {{item.isToday ? 'cell--today' : ''}} {{item.isSel ? 'cell--sel' : ''}}"
+            data-ds="{{item.ds}}"
+            data-dim="{{item.dim}}"
+            bindtap="onSelectDay"
+          >
+            {{item.day}}
+            <view wx:if="{{item.has}}" class="dot" />
+          </view>
+        </view>
       </view>
-    </view>
-  </view>
 
-  <view class="sec-title">
-    {{selLabel}} 训练详情
-    <text class="sec-sub" wx:if="{{selRecords.length}}"> · {{selRecords.length}} 个动作 / {{selSets}} 组 / 约 {{selDuration}} 分钟</text>
-  </view>
-  <view class="card detail-card">
-    <log-item
-      wx:for="{{selRecords}}"
-      wx:key="_id"
-      record="{{item}}"
-      compact
-    />
-    <empty wx:if="{{!selRecords.length}}" icon="📅" text="当天没有训练记录" />
-  </view>
+      <view class="sec-title">
+        {{selLabel}} 训练详情
+        <text class="sec-sub" wx:if="{{selRecords.length}}"> · {{selRecords.length}} 个动作 / {{selSets}} 组 / 约 {{selDuration}} 分钟</text>
+      </view>
+      <view class="card detail-card">
+        <log-item
+          wx:for="{{selRecords}}"
+          wx:key="_id"
+          record="{{item}}"
+          compact
+        />
+        <empty wx:if="{{!selRecords.length}}" icon="📅" text="当天没有训练记录" />
+      </view>
+    </block>
+  </load-state>
 </view>

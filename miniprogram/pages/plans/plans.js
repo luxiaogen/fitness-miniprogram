@@ -2,6 +2,7 @@
 const planService = require('../../services/plan');
 const store = require('../../store/index');
 const { withTheme } = require('../../utils/withTheme');
+const { showError } = require('../../utils/notify');
 
 withTheme({
   data: {
@@ -14,8 +15,18 @@ withTheme({
   },
 
   onShow() {
-    const cur = planService.current();
-    this.setData({ currentPlanId: cur ? cur.planId : '' });
+    this.loadCurrentPlanId();
+  },
+
+  async loadCurrentPlanId() {
+    try {
+      const cur = await planService.current();
+      if (this._unloaded) return;
+      this.setData({ currentPlanId: cur ? cur.planId : '' });
+    } catch (e) {
+      if (this._unloaded) return;
+      showError(e, '当前计划加载失败');
+    }
   },
 
   onOpen(e) {
@@ -24,5 +35,9 @@ withTheme({
 
   onShareAppMessage() {
     return { title: '热门训练计划 · 找到适合你的方案', path: '/pages/plans/plans' };
+  },
+
+  onUnload() {
+    this._unloaded = true;
   },
 });

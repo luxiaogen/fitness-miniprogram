@@ -8,43 +8,25 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
+// 数值限制与归一化来自 shared/validation.js 的生成副本（与小程序端同一事实源）
+const { RECORD_LIMITS, normalizeNumber } = require('./validation-shared');
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PAGE_SIZE = 100;
 const MAX_BATCH_SIZE = 20;
-const RECORD_LIMITS = {
-  sets: { min: 1, max: 100, label: '组数', integer: true },
-  reps: { min: 1, max: 1000, label: '每组次数', integer: true },
-  weight: { min: 0, max: 10000, label: '重量', integer: false },
-  duration: { min: 1, max: 1440, label: '时长', integer: true },
-};
 
 function isValidDate(value) {
   if (!DATE_RE.test(value)) return false;
-  const date = new Date(`${value}T00:00:00`);
+  // UTC 解析 + UTC getters：与客户端 utils/validation.js 保持一致，不受云函数运行时区影响
+  const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) &&
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` === value;
+    `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}` === value;
 }
 
 function businessToday() {
   // Training dates are defined in China Standard Time, not the cloud runtime's
   // implicit timezone, so late-night writes stay consistent with the client.
   return new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
-}
-
-function finiteNumber(value, label) {
-  const number = Number(value);
-  if (!Number.isFinite(number)) throw new Error(`${label}必须是有效数字`);
-  return number;
-}
-
-function normalizeNumber(value, limits) {
-  const number = finiteNumber(value, limits.label);
-  if ((limits.integer && !Number.isInteger(number)) || number < limits.min || number > limits.max) {
-    const suffix = limits.integer ? '的整数' : '';
-    throw new Error(`${limits.label}应为 ${limits.min}-${limits.max}${suffix}`);
-  }
-  return number;
 }
 
 function pageArgs(event) {
@@ -153,6 +135,23 @@ exports.main = async (event) => {
         return created;
       });
       return { code: 0, data: items };
+    }
+
+    case 'update': {
+      const id = String(event.id || '').trim();
+      if (!id) return { code: -1, msg: '缺少 id' };
+      let doc;
+      try {
+        doc = recordDocument(event.record || {}, OPENID);
+      } catch (e) {
+        return { code: -1, msg: e.message };
+      }
+      // _openid 与 createdAt 不可变：仅更新业务字段，防止越权改写归属与创建时间
+      delete doc._openid;
+      delete doc.createdAt;
+      const res = await coll.where({ _openid: OPENID, _id: id }).update({ data: doc });
+      if (res.stats.updated === 0) return { code: -1, msg: '记录不存在或无权修改' };
+      return { code: 0, data: { ...doc, _id: id } };
     }
 
     case 'remove': {
