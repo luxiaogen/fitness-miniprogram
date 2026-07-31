@@ -14,7 +14,7 @@
         wx:key="id"
         exercise="{{item}}"
         size="small"
-        bind:select="onSelect"
+        bindselect="onSelect"
       />
       <view wx:if="{{!list.length}}" class="none">无匹配动作</view>
     </scroll-view>

@@ -58,7 +58,7 @@
     visible="{{formVisible}}"
     submitting="{{formSubmitting}}"
     ex-id="{{exercise.id}}"
-    bind:close="onFormClose"
-    bind:confirm="onFormConfirm"
+    bindclose="onFormClose"
+    bindconfirm="onFormConfirm"
   />
 </view>

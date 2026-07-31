@@ -35,39 +35,46 @@
   </view>
 
   <!-- 当日训练列表 -->
-  <log-item
-    wx:for="{{records}}"
-    wx:key="_id"
-    record="{{item}}"
-deletable
-    bind:delete="onDelete"
-  />
+  <load-state loading="{{loading}}" error="{{loadError}}" retryText="重新加载" bindretry="onRetryRecords">
+    <block>
+      <log-item
+        wx:for="{{records}}"
+        wx:key="_id"
+        record="{{item}}"
+        deletable
+        editable
+        bindedit="onEdit"
+        binddelete="onDelete"
+      />
 
-  <empty
-    wx:if="{{!records.length}}"
-    icon="🏋️"
-    text="当天还没有训练记录"
-    sub="点击下方按钮添加第一个动作"
-  />
+      <empty
+        wx:if="{{!records.length}}"
+        icon="🏋️"
+        text="当天还没有训练记录"
+        sub="点击下方按钮添加第一个动作"
+      />
 
-  <view wx:if="{{records.length}}" class="summary">
-    共 {{records.length}} 个动作 · {{totalSets}} 组 · 约 {{totalDuration}} 分钟
-  </view>
+      <view wx:if="{{records.length}}" class="summary">
+        共 {{records.length}} 个动作 · {{totalSets}} 组 · 约 {{totalDuration}} 分钟
+      </view>
 
-  <view class="add-wrap">
-    <button class="btn-primary" bindtap="onOpenPicker">＋ 添加训练动作</button>
-  </view>
+      <view class="add-wrap">
+        <button class="btn-primary" bindtap="onOpenPicker">＋ 添加训练动作</button>
+      </view>
+    </block>
+  </load-state>
 
   <ex-picker
     visible="{{pickerVisible}}"
-    bind:close="onPickerClose"
-    bind:select="onPicked"
+    bindclose="onPickerClose"
+    bindselect="onPicked"
   />
   <record-form
     visible="{{formVisible}}"
     submitting="{{formSubmitting}}"
     ex-id="{{pickedExId}}"
-    bind:close="onFormClose"
-    bind:confirm="onFormConfirm"
+    initial="{{editingRecord}}"
+    bindclose="onFormClose"
+    bindconfirm="onFormConfirm"
   />
 </view>
